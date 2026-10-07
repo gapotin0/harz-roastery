@@ -1,4 +1,8 @@
 import { firestore } from "../config/firebase";
+import {
+  pendingTelegramNotification,
+  type TelegramNotification,
+} from "../types/telegramNotification";
 
 import type { Product } from "./product.service";
 
@@ -35,6 +39,7 @@ export type Order = {
   items: OrderItem[];
   total: number;
   status: OrderStatus;
+  notification?: TelegramNotification;
 };
 
 export type CreateOrderItem = {
@@ -66,6 +71,16 @@ export async function getOrders(): Promise<Order[]> {
   return snapshot.docs
     .map((document) => document.data() as Order)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function getOrder(id: number): Promise<Order> {
+  const snapshot = await getOrdersCollection().doc(String(id)).get();
+
+  if (!snapshot.exists) {
+    throw new Error(`Order with id ${id} was not found.`);
+  }
+
+  return snapshot.data() as Order;
 }
 
 // ----------------------------------------------------------------------
@@ -161,6 +176,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
       items: orderItems,
       total,
       status: "new",
+      notification: pendingTelegramNotification(),
     };
 
     // Списываем остатки.
@@ -212,11 +228,25 @@ export async function updateOrderStatus(
 
   const order = snapshot.data() as Order;
 
-  const updatedOrder: Order = { ...order, status };
+  await document.update({ status });
 
-  await document.set(updatedOrder, { merge: false });
+  return { ...order, status };
+}
 
-  return updatedOrder;
+export async function saveOrderNotification(
+  id: number,
+  notification: TelegramNotification,
+): Promise<Order> {
+  const document = getOrdersCollection().doc(String(id));
+  const snapshot = await document.get();
+
+  if (!snapshot.exists) {
+    throw new Error(`Order with id ${id} was not found.`);
+  }
+
+  await document.update({ notification });
+
+  return { ...(snapshot.data() as Order), notification };
 }
 
 // ----------------------------------------------------------------------

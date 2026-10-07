@@ -2,7 +2,7 @@ import { auth } from "./firebase";
 
 import type { Order, OrderCustomer, OrderStatus } from "../data/orders";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL } from "./apiBase";
 
 export type CreateOrderInput = {
   customer: OrderCustomer;
@@ -79,6 +79,25 @@ export async function updateOrderStatus(
     const errorData = await response.json().catch(() => null);
 
     throw new Error(errorData?.message ?? "Failed to update order.");
+  }
+
+  return (await response.json()) as Order;
+}
+
+export async function resendOrderNotification(id: number): Promise<Order> {
+  const token = await getAdminToken();
+
+  const response = await fetch(`${API_URL}/api/orders/${id}/notify`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+
+    throw new Error(
+      errorData?.message ?? "Failed to send the order to Telegram.",
+    );
   }
 
   return (await response.json()) as Order;

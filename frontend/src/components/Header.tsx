@@ -6,10 +6,14 @@ import {
   type SetStateAction,
 } from "react";
 import { css, cx } from "@emotion/css";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+
+import { softEase } from "./motion";
 
 import C7_order_place from "./C7_order_place";
 
 import type { OrderItem } from "../data/orders";
+import { applyTheme, readTheme } from "../preferences";
 import { translations } from "./translations";
 
 import img_cart from "../assets/header/cart.svg";
@@ -218,6 +222,49 @@ const menu_wrapper = css({
   position: "relative",
 });
 
+const dropdown_nav = css({
+  display: "none",
+
+  "@media (max-width: 900px)": {
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+
+    marginBottom: "4px",
+    paddingBottom: "8px",
+
+    borderBottom: "1px solid var(--sand-line)",
+  },
+
+  "& a": {
+    display: "flex",
+    alignItems: "center",
+
+    width: "100%",
+    boxSizing: "border-box",
+
+    padding: "12px 14px",
+
+    borderRadius: "12px",
+
+    color: "var(--text-main)",
+    textDecoration: "none",
+    fontSize: "13px",
+    fontWeight: "600",
+
+    "&:hover": {
+      backgroundColor: "var(--chip-bg)",
+    },
+  },
+
+  "@media (max-width: 480px)": {
+    "& a": {
+      padding: "11px 12px",
+      fontSize: "12px",
+    },
+  },
+});
+
 const dropdown_menu = css({
   position: "absolute",
   top: "calc(100% + 12px)",
@@ -235,20 +282,6 @@ const dropdown_menu = css({
   border: "1px solid var(--sand-line)",
   borderRadius: "18px",
   boxShadow: "0 16px 40px rgba(0, 0, 0, 0.18)",
-
-  animation: "menuFadeIn 0.18s ease",
-
-  "@keyframes menuFadeIn": {
-    from: {
-      opacity: 0,
-      transform: "translateY(-6px)",
-    },
-
-    to: {
-      opacity: 1,
-      transform: "translateY(0)",
-    },
-  },
 
   "& button": {
     display: "flex",
@@ -340,10 +373,11 @@ function Header({
   clearCart,
   refreshProducts,
 }: HeaderProps) {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">(readTheme);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = Boolean(useReducedMotion());
 
   const t = translations[language];
 
@@ -352,11 +386,15 @@ function Header({
     0,
   );
 
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
 
+    applyTheme(newTheme);
     setTheme(newTheme);
-    document.documentElement.setAttribute("data-theme", newTheme);
   };
 
   const toggleLanguage = () => {
@@ -378,59 +416,139 @@ function Header({
   }, []);
 
   return (
-    <header className={cx("font-onest", header_place)}>
-      <div className={logo_place}>
+    <motion.header
+      className={cx("font-onest", header_place)}
+      initial={reduceMotion ? false : { opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0 : 0.45, ease: softEase }}
+    >
+      <motion.div
+        className={logo_place}
+        whileHover={reduceMotion ? undefined : { scale: 1.03 }}
+        whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+        transition={{ duration: 0.2 }}
+      >
         <img src={logo_minimal} alt="HARZ Roastery" />
         <span>HARZ ROASTERY</span>
-      </div>
+      </motion.div>
       <div className={navigation_wrapper}>
         <nav aria-label="main-navigation">
           <ul className={navigation}>
             <li>
-              <a href="#about">{t.nav.home}</a>
+              <motion.a
+                href="#about"
+                whileHover={reduceMotion ? undefined : { y: -1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {t.nav.home}
+              </motion.a>
             </li>
             <li>
-              <a href="#coffee">{t.nav.coffee}</a>
+              <motion.a
+                href="#coffee"
+                whileHover={reduceMotion ? undefined : { y: -1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {t.nav.coffee}
+              </motion.a>
             </li>
             <li>
-              <a href="#courses">{t.nav.courses}</a>
+              <motion.a
+                href="#courses"
+                whileHover={reduceMotion ? undefined : { y: -1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {t.nav.courses}
+              </motion.a>
             </li>
             <li>
-              <a href="#shop">{t.nav.shop}</a>
+              <motion.a
+                href="#shop"
+                whileHover={reduceMotion ? undefined : { y: -1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {t.nav.shop}
+              </motion.a>
             </li>
           </ul>
         </nav>
       </div>
       <div className={nav_place_buttons}>
         <a href="#shop">
-          <button className={shop_button} type="button">
+          <motion.button
+            className={shop_button}
+            type="button"
+            whileHover={reduceMotion ? undefined : { scale: 1.04 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.18 }}
+          >
             {t.nav.shop}
-          </button>
+          </motion.button>
         </a>
         <div className={cart_button_wrapper}>
-          <button
+          <motion.button
             type="button"
             className={nav_buttons}
-            aria-label="Cart"
+            aria-label={t.nav.cart}
             onClick={() => setCartOpen(true)}
+            whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+            transition={{ duration: 0.18 }}
           >
             <img className="icon" src={img_cart} alt="" />
-          </button>
+          </motion.button>
           {totalCartQuantity > 0 && (
-            <span className={cart_badge}>{totalCartQuantity}</span>
+            <motion.span
+              key={totalCartQuantity}
+              className={cart_badge}
+              initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { type: "spring", stiffness: 460, damping: 16 }
+              }
+            >
+              {totalCartQuantity}
+            </motion.span>
           )}
         </div>
         <div className={menu_wrapper} ref={menuRef}>
-          <button
+          <motion.button
             type="button"
             className={nav_buttons}
             onClick={() => setMenuOpen((current) => !current)}
-            aria-label="Menu"
+            aria-label={t.nav.menu}
+            whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+            transition={{ duration: 0.18 }}
           >
             <img className="icon" src={img_menu} alt="" />
-          </button>
+          </motion.button>
+          <AnimatePresence>
           {menuOpen && (
-            <div className={dropdown_menu}>
+            <motion.div
+              key="menu"
+              className={dropdown_menu}
+              initial={reduceMotion ? false : { opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: reduceMotion ? 0 : 0.18, ease: softEase }}
+            >
+              <nav className={dropdown_nav} aria-label="main-navigation">
+                <a href="#about" onClick={() => setMenuOpen(false)}>
+                  {t.nav.home}
+                </a>
+                <a href="#coffee" onClick={() => setMenuOpen(false)}>
+                  {t.nav.coffee}
+                </a>
+                <a href="#courses" onClick={() => setMenuOpen(false)}>
+                  {t.nav.courses}
+                </a>
+                <a href="#shop" onClick={() => setMenuOpen(false)}>
+                  {t.nav.shop}
+                </a>
+              </nav>
               <button type="button" onClick={toggleTheme}>
                 {t.nav.theme}:{" "}
                 {theme === "dark" ? t.nav.theme_dark : t.nav.theme_light}
@@ -438,8 +556,9 @@ function Header({
               <button type="button" onClick={toggleLanguage}>
                 {t.nav.language}: {language === "en" ? "English" : "Українська"}
               </button>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
       {cartOpen && (
@@ -454,7 +573,7 @@ function Header({
           refreshProducts={refreshProducts}
         />
       )}
-    </header>
+    </motion.header>
   );
 }
 

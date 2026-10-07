@@ -5,7 +5,7 @@ HARZ Roastery is a full-stack website for a specialty coffee roastery: a bilingu
 custom roasting requests and an admin panel for managing the whole catalogue.
 
 The project consists of a React single-page application and an Express API that
-stores data in Firestore, uploads product images to Firebase Storage or Cloudinary,
+stores data in Firestore, uploads product images to Firebase Storage,
 translates admin content with DeepL and sends new request notifications to Telegram.
 
 ## Features
@@ -23,7 +23,7 @@ translates admin content with DeepL and sends new request notifications to Teleg
 
 - Sign-in with Firebase Authentication
 - Dashboard with products, orders, courses, enrollments and roasting requests
-- Product management with image cropping and Firebase Storage / Cloudinary uploads
+- Product management with image cropping and Firebase Storage uploads
 - Course management with active / inactive state
 - Order, course enrollment and custom roasting request status management
 - Ukrainian → English translation of courses and product descriptions via DeepL
@@ -52,7 +52,6 @@ translates admin content with DeepL and sends new request notifications to Teleg
 - Firestore
 - Firebase Authentication
 - Firebase Storage
-- Cloudinary
 - DeepL API
 - Telegram Bot API
 
@@ -71,7 +70,7 @@ harz_rostery/
 │
 └── backend/                  Express API
     └── src/
-        ├── config/           Firebase Admin and Cloudinary setup
+        ├── config/           Firebase Admin setup
         ├── controllers/      Request validation and responses
         ├── middleware/       Admin authentication
         ├── routes/           API routes
@@ -129,14 +128,10 @@ which are ignored by Git.
 | `FRONTEND_URL`                   | Allowed CORS origin (default `http://localhost:5173`)        |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Path to the Firebase Admin service account JSON              |
 | `FIREBASE_STORAGE_BUCKET`        | Firebase Storage bucket for product images                   |
-| `ADMIN_UID`                      | Firebase Auth UID of the user allowed to use the admin API   |
+| `ADMIN_UID`                      | Firebase Auth UIDs allowed to use the admin API, comma-separated. A user with the custom claim `admin: true` is also allowed (`npm run set-admin -- <uid>` in `backend`) |
 | `DEEPL_API_KEY`                  | DeepL API key                                                |
-| `IMAGE_STORAGE_PROVIDER`         | Product image storage: `firebase` or `cloudinary`            |
-| `CLOUDINARY_CLOUD_NAME`          | Cloudinary cloud name (only for the `cloudinary` provider)   |
-| `CLOUDINARY_API_KEY`             | Cloudinary API key                                           |
-| `CLOUDINARY_API_SECRET`          | Cloudinary API secret                                        |
 | `TELEGRAM_BOT_TOKEN`             | Telegram bot token for notifications                         |
-| `TELEGRAM_CHAT_ID`               | Telegram chat that receives notifications                    |
+| `TELEGRAM_RECIPIENT_IDS`         | Comma-separated Telegram user ids that receive notifications |
 
 **Frontend** (`frontend/.env`, template: `frontend/.env.example`)
 
@@ -150,9 +145,9 @@ which are ignored by Git.
 | ---------------------------- | ------ | ------------------------------------------------ |
 | `/api/products`              | `GET`  | `POST`, `POST /reset`, `PUT /:id`, `DELETE /:id` |
 | `/api/courses`               | `GET`  | `POST`, `PUT /:id`, `DELETE /:id`                |
-| `/api/orders`                | `POST` | `GET`, `PATCH /:id/status`, `DELETE /:id`        |
-| `/api/course-enrollments`    | `POST` | `GET`, `PATCH /:id/status`, `DELETE /:id`        |
-| `/api/custom-roasting`       | `POST` | `GET`, `PATCH /:id/status`, `DELETE /:id`        |
+| `/api/orders`                | `POST` | `GET`, `PATCH /:id/status`, `POST /:id/notify`, `DELETE /:id` |
+| `/api/course-enrollments`    | `POST` | `GET`, `PATCH /:id/status`, `POST /:id/notify`, `DELETE /:id` |
+| `/api/custom-roasting`       | `POST` | `GET`, `PATCH /:id/status`, `POST /:id/notify`, `DELETE /:id` |
 | `/api/uploads/product-image` | –      | `POST`                                           |
 | `/api/translate/course`      | –      | `POST`                                           |
 | `/api/translate/product`     | –      | `POST`                                           |
@@ -167,9 +162,9 @@ Firestore collections: `harz_products`, `harz_academy_courses`, `harz_orders`,
 - The Firebase Admin service account JSON is stored locally in `backend/secrets/`
   and is ignored by Git.
 - Admin routes require a Firebase ID token (`Authorization: Bearer <token>`). The
-  backend verifies the token with the Firebase Admin SDK and only allows the user
-  whose UID matches `ADMIN_UID`.
-- DeepL, Cloudinary and Telegram credentials are used only by the backend; the frontend never
+  backend verifies the token with the Firebase Admin SDK and allows a user
+  whose UID is listed in `ADMIN_UID` or who has the custom claim `admin: true`.
+- DeepL and Telegram credentials are used only by the backend; the frontend never
   receives them.
 
 ## Build

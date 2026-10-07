@@ -1,4 +1,8 @@
 import { firestore } from "../config/firebase";
+import {
+  pendingTelegramNotification,
+  type TelegramNotification,
+} from "../types/telegramNotification";
 
 import type { AcademyCourse } from "./course.service";
 
@@ -26,6 +30,7 @@ export type CourseEnrollment = {
     phone: string;
   };
   status: CourseEnrollmentStatus;
+  notification?: TelegramNotification;
 };
 
 export type CreateCourseEnrollmentInput = {
@@ -56,6 +61,18 @@ export async function getCourseEnrollments(): Promise<CourseEnrollment[]> {
   return snapshot.docs
     .map((document) => document.data() as CourseEnrollment)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function getCourseEnrollment(
+  id: number,
+): Promise<CourseEnrollment> {
+  const snapshot = await getCollection().doc(String(id)).get();
+
+  if (!snapshot.exists) {
+    throw new Error(`Course enrollment with id ${id} was not found.`);
+  }
+
+  return snapshot.data() as CourseEnrollment;
 }
 
 // ----------------------------------------------------------------------
@@ -97,6 +114,7 @@ export async function createCourseEnrollment(
       phone: input.customer.phone.trim(),
     },
     status: "new",
+    notification: pendingTelegramNotification(),
   };
 
   await getCollection().doc(String(id)).set(enrollment);
@@ -121,11 +139,25 @@ export async function updateCourseEnrollmentStatus(
 
   const enrollment = snapshot.data() as CourseEnrollment;
 
-  const updatedEnrollment: CourseEnrollment = { ...enrollment, status };
+  await document.update({ status });
 
-  await document.set(updatedEnrollment, { merge: false });
+  return { ...enrollment, status };
+}
 
-  return updatedEnrollment;
+export async function saveCourseEnrollmentNotification(
+  id: number,
+  notification: TelegramNotification,
+): Promise<CourseEnrollment> {
+  const document = getCollection().doc(String(id));
+  const snapshot = await document.get();
+
+  if (!snapshot.exists) {
+    throw new Error(`Course enrollment with id ${id} was not found.`);
+  }
+
+  await document.update({ notification });
+
+  return { ...(snapshot.data() as CourseEnrollment), notification };
 }
 
 // ----------------------------------------------------------------------

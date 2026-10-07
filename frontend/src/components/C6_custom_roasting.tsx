@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
 import C6_CustomRoastingForm from "./C6_CustomRoastingForm";
 
+import { rise, softEase, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
-import photo from "../assets/c6_roster.png";
+import photo from "../assets/roasting.webp";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -181,28 +183,45 @@ const img_roster = css({
 
 function C6_custom_roasting({ language }: C6Props) {
   const t = translations[language];
+  const { reduce, reveal } = useSoftMotion();
 
   const [formOpen, setFormOpen] = useState(false);
 
   return (
     <>
       <div className={c6_wrapper}>
-        <div className={cx("font-onest", c6_place)}>
+        <motion.div
+          className={cx("font-onest", c6_place)}
+          variants={rise}
+          {...reveal}
+        >
           <div className={c6_text}>
             <h2 className={c6_title}>{t.c6.title}</h2>
             <p className={c6_description}>{t.c6.text}</p>
-            <button
+            <motion.button
               type="button"
               className={c6_button}
               onClick={() => setFormOpen(true)}
+              whileHover={reduce ? undefined : { scale: 1.03 }}
+              whileTap={reduce ? undefined : { scale: 0.98 }}
+              transition={{ duration: 0.18 }}
             >
               {t.c6.button}
-            </button>
+            </motion.button>
           </div>
-          <div className={img_roster}>
-            <img src={photo} alt="Coffee roaster" />
-          </div>
-        </div>
+          <motion.div className={img_roster} variants={rise}>
+            <motion.img
+              src={photo}
+              alt="Coffee roaster"
+              loading="lazy"
+              decoding="async"
+              initial={reduce ? false : { scale: 1.08 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: reduce ? 0 : 1.1, ease: softEase }}
+            />
+          </motion.div>
+        </motion.div>
       </div>
       {formOpen && (
         <C6_CustomRoastingForm

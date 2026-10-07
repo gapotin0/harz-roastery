@@ -1,4 +1,8 @@
 import { firestore } from "../config/firebase";
+import {
+  pendingTelegramNotification,
+  type TelegramNotification,
+} from "../types/telegramNotification";
 
 export type CustomRoastingStatus =
   | "new"
@@ -23,6 +27,7 @@ export type CustomRoastingRequest = {
   };
   message: string;
   status: CustomRoastingStatus;
+  notification?: TelegramNotification;
 };
 
 export type CreateCustomRoastingInput = {
@@ -61,6 +66,18 @@ export async function getCustomRoastingRequests(): Promise<
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+export async function getCustomRoastingRequest(
+  id: number,
+): Promise<CustomRoastingRequest> {
+  const snapshot = await getCollection().doc(String(id)).get();
+
+  if (!snapshot.exists) {
+    throw new Error(`Custom roasting request with id ${id} was not found.`);
+  }
+
+  return snapshot.data() as CustomRoastingRequest;
+}
+
 // ----------------------------------------------------------------------
 // CREATE
 // ----------------------------------------------------------------------
@@ -86,6 +103,7 @@ export async function createCustomRoastingRequest(
     },
     message: input.message.trim(),
     status: "new",
+    notification: pendingTelegramNotification(),
   };
 
   await getCollection().doc(String(id)).set(request);
@@ -110,11 +128,25 @@ export async function updateCustomRoastingStatus(
 
   const request = snapshot.data() as CustomRoastingRequest;
 
-  const updatedRequest: CustomRoastingRequest = { ...request, status };
+  await document.update({ status });
 
-  await document.set(updatedRequest, { merge: false });
+  return { ...request, status };
+}
 
-  return updatedRequest;
+export async function saveCustomRoastingNotification(
+  id: number,
+  notification: TelegramNotification,
+): Promise<CustomRoastingRequest> {
+  const document = getCollection().doc(String(id));
+  const snapshot = await document.get();
+
+  if (!snapshot.exists) {
+    throw new Error(`Custom roasting request with id ${id} was not found.`);
+  }
+
+  await document.update({ notification });
+
+  return { ...(snapshot.data() as CustomRoastingRequest), notification };
 }
 
 // ----------------------------------------------------------------------

@@ -1,5 +1,6 @@
 import { css } from "@emotion/css";
 
+import ATelegramNotice from "../ATelegramNotice";
 import AOrder_StatusSelect from "./AOrder_StatusSelect";
 
 import type { Order, OrderStatus } from "../../data/orders";
@@ -17,6 +18,8 @@ type Props = {
   order: Order;
   onStatusChange: (orderId: number, status: OrderStatus) => void;
   onDelete: (orderId: number) => void;
+  onResend: (orderId: number) => void;
+  isResending: boolean;
 };
 
 // ----------------------------------------------------------------------
@@ -254,7 +257,14 @@ const formatDate = (date: string, language: AdminLanguage) => {
 // COMPONENT
 // ----------------------------------------------------------------------
 
-function AOrder_Card({ language, order, onStatusChange, onDelete }: Props) {
+function AOrder_Card({
+  language,
+  order,
+  onStatusChange,
+  onDelete,
+  onResend,
+  isResending,
+}: Props) {
   const t = adminTranslations[language].orders;
 
   return (
@@ -265,6 +275,12 @@ function AOrder_Card({ language, order, onStatusChange, onDelete }: Props) {
             {t.order} #{order.id}
           </h3>
           <p>{formatDate(order.createdAt, language)}</p>
+          <ATelegramNotice
+            language={language}
+            notification={order.notification}
+            isSending={isResending}
+            onResend={() => onResend(order.id)}
+          />
         </div>
         <div className={header_right}>
           <AOrder_StatusSelect

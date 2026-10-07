@@ -3,6 +3,7 @@ import { css, cx } from "@emotion/css";
 
 import { createCourseEnrollment } from "../services/courseEnrollmentApi";
 
+import { MotionDialog } from "./motion";
 import { translations } from "./translations";
 
 import close_icon from "../assets/close_icon.svg";
@@ -536,11 +537,12 @@ function C5_academy_card({
 
   if (isSuccess) {
     return (
-      <div className={overlay} onClick={onClose}>
-        <div
-          className={cx(card_place, "font-onest")}
-          onClick={(event) => event.stopPropagation()}
-        >
+      <MotionDialog
+        overlayClass={overlay}
+        panelClass={cx(card_place, "font-onest")}
+        onClose={onClose}
+        closeOn="click"
+      >
           <div className={success_content}>
             <div className={success_icon}>✓</div>
 
@@ -560,17 +562,17 @@ function C5_academy_card({
               {language === "uk" ? "Готово" : "Done"}
             </button>
           </div>
-        </div>
-      </div>
+      </MotionDialog>
     );
   }
 
   return (
-    <div className={overlay} onClick={onClose}>
-      <div
-        className={cx(card_place, "font-onest")}
-        onClick={(event) => event.stopPropagation()}
-      >
+    <MotionDialog
+      overlayClass={overlay}
+      panelClass={cx(card_place, "font-onest")}
+      onClose={onClose}
+      closeOn="click"
+    >
         <div className={cp_top}>
           <div className={cp_top_p1}>
             <h3>Specialty Coffee Academy</h3>
@@ -624,8 +626,7 @@ function C5_academy_card({
             <p>{t.c7_card.enrl_rules}</p>
           </div>
         </form>
-      </div>
-    </div>
+    </MotionDialog>
   );
 }
 

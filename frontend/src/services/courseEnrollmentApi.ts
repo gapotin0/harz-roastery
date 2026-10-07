@@ -1,11 +1,10 @@
+import { API_URL } from "./apiBase";
 import { auth } from "./firebase";
 
 import type {
   CourseEnrollment,
   CourseEnrollmentStatus,
 } from "../data/courseEnrollments";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 export type CreateCourseEnrollmentInput = {
   courseId: number;
@@ -89,6 +88,30 @@ export async function updateCourseEnrollmentStatus(
     const errorData = await response.json().catch(() => null);
 
     throw new Error(errorData?.message ?? "Failed to update enrollment.");
+  }
+
+  return (await response.json()) as CourseEnrollment;
+}
+
+export async function resendCourseEnrollmentNotification(
+  id: number,
+): Promise<CourseEnrollment> {
+  const token = await getAdminToken();
+
+  const response = await fetch(
+    `${API_URL}/api/course-enrollments/${id}/notify`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+
+    throw new Error(
+      errorData?.message ?? "Failed to send the enrollment to Telegram.",
+    );
   }
 
   return (await response.json()) as CourseEnrollment;

@@ -9,6 +9,8 @@ export const translations = {
       theme_light: "Light",
       theme_dark: "Dark",
       language: "Language",
+      cart: "Cart",
+      menu: "Menu",
     },
 
     c1: {
@@ -154,6 +156,14 @@ export const translations = {
       no_products: "No products found in this category.",
 
       add_to_cart: "Add to cart",
+      previous_page: "Previous page",
+      next_page: "Next page",
+    },
+
+    roast: {
+      "Light Roast": "Light Roast",
+      "Medium Roast": "Medium Roast",
+      "Dark Roast": "Dark Roast",
     },
 
     c7_card: {
@@ -186,6 +196,26 @@ export const translations = {
       terms: "Terms of Service",
     },
 
+    legal: {
+      back: "Back to home",
+      privacy: {
+        title: "Privacy Policy",
+        paragraphs: [
+          "When you place an order, enroll in a course, or request a custom roast, we ask for the details needed to fulfill that request: your name, email, phone number, and, for coffee orders, the delivery city and address.",
+          "We use this information to prepare the order or request and to contact you about it. Orders, enrollments, and roasting requests are stored in Firebase, and a notification is sent to the roastery in Telegram.",
+          "We do not sell this information. To ask about your data, write to hello@harzroastery.com.",
+        ],
+      },
+      terms: {
+        title: "Terms of Service",
+        paragraphs: [
+          "HARZ Roastery sells specialty coffee and accepts requests for barista courses and custom roasting. Prices shown on the site are the prices of the coffee or the course.",
+          "Sending an order or a request does not take payment on the site. We confirm availability, delivery, and payment with you directly.",
+          "Questions about an order, a course, or a roast can be sent to hello@harzroastery.com.",
+        ],
+      },
+    },
+
     cart: {
       title: "Your Cart",
       empty: "Your cart is empty.",
@@ -210,6 +240,8 @@ export const translations = {
       theme_light: "Світла",
       theme_dark: "Темна",
       language: "Мова",
+      cart: "Кошик",
+      menu: "Меню",
     },
 
     c1: {
@@ -356,6 +388,14 @@ export const translations = {
       no_products: "У цій категорії немає товарів.",
 
       add_to_cart: "Додати до кошика",
+      previous_page: "Попередня сторінка",
+      next_page: "Наступна сторінка",
+    },
+
+    roast: {
+      "Light Roast": "Світле обсмажування",
+      "Medium Roast": "Середнє обсмажування",
+      "Dark Roast": "Темне обсмажування",
     },
 
     c7_card: {
@@ -368,7 +408,7 @@ export const translations = {
 
     form: {
       name: "Повне ім`я",
-      email: "Електронная скринька",
+      email: "Електронна скринька",
       phone: "Телефонний номер",
     },
 
@@ -388,6 +428,26 @@ export const translations = {
       terms: "Умови користування",
     },
 
+    legal: {
+      back: "На головну",
+      privacy: {
+        title: "Політика конфіденційності",
+        paragraphs: [
+          "Коли ви оформлюєте замовлення, записуєтесь на курс або залишаєте заявку на обсмажування, ми просимо дані, потрібні для цього запиту: ім’я, електронну пошту, телефон, а для замовлення кави — місто й адресу доставки.",
+          "Ці дані використовуються, щоб виконати замовлення чи заявку і зв’язатися з вами. Замовлення, записи на курси та заявки на обсмажування зберігаються у Firebase, а сповіщення надсилається ростерії в Telegram.",
+          "Ми не продаємо ці дані. Питання щодо ваших даних можна надіслати на hello@harzroastery.com.",
+        ],
+      },
+      terms: {
+        title: "Умови користування",
+        paragraphs: [
+          "HARZ Roastery продає спешелті каву та приймає заявки на курси бариста й індивідуальне обсмажування. Ціни на сайті — це ціни кави або курсу.",
+          "Надсилання замовлення чи заявки не списує оплату на сайті. Наявність, доставку й оплату ми підтверджуємо з вами напряму.",
+          "Питання щодо замовлення, курсу чи обсмажування можна надіслати на hello@harzroastery.com.",
+        ],
+      },
+    },
+
     cart: {
       title: "Ваш кошик",
       empty: "Ваш кошик порожній.",
@@ -402,3 +462,13 @@ export const translations = {
     },
   },
 };
+
+export function roastLabel(roast: string, language: "en" | "uk") {
+  const labels = translations[language].roast;
+
+  if (roast in labels) {
+    return labels[roast as keyof typeof labels];
+  }
+
+  return roast;
+}

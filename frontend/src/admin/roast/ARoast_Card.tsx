@@ -1,5 +1,6 @@
 import { css } from "@emotion/css";
 
+import ATelegramNotice from "../ATelegramNotice";
 import ARoast_StatusSelect from "./ARoast_StatusSelect";
 
 import type {
@@ -20,6 +21,8 @@ type Props = {
   request: CustomRoastingRequest;
   onStatusChange: (id: number, status: CustomRoastingStatus) => void;
   onDelete: (id: number) => void;
+  onResend: (id: number) => void;
+  isResending: boolean;
 };
 
 // ----------------------------------------------------------------------
@@ -154,7 +157,14 @@ const delete_button = css({
 // COMPONENT
 // ----------------------------------------------------------------------
 
-function ARoast_Card({ language, request, onStatusChange, onDelete }: Props) {
+function ARoast_Card({
+  language,
+  request,
+  onStatusChange,
+  onDelete,
+  onResend,
+  isResending,
+}: Props) {
   const t = adminTranslations[language].roasting;
   const roastLevelLabels: Record<string, string> = {
     Light: t.roastLevels.light,
@@ -188,6 +198,12 @@ function ARoast_Card({ language, request, onStatusChange, onDelete }: Props) {
             {" · "}
             {createdAt}
           </p>
+          <ATelegramNotice
+            language={language}
+            notification={request.notification}
+            isSending={isResending}
+            onResend={() => onResend(request.id)}
+          />
         </div>
         <ARoast_StatusSelect
           language={language}

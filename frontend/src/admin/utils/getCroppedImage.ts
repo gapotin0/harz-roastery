@@ -77,5 +77,5 @@ export async function getCroppedImage(
     OUTPUT_SIZE,
   );
 
-  return outputCanvas.toDataURL("image/webp", 0.88);
+  return outputCanvas.toDataURL("image/webp", 0.82);
 }

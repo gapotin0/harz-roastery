@@ -1,14 +1,21 @@
 import type { Request, Response } from "express";
 
-import { sendCourseEnrollmentNotification } from "../services/telegram.service";
+import {
+  deliverTelegramNotification,
+  deliverTelegramNotificationInBackground,
+  sendCourseEnrollmentNotification,
+} from "../services/telegram.service";
 import {
   createCourseEnrollment,
   deleteCourseEnrollment,
+  getCourseEnrollment,
   getCourseEnrollments,
+  saveCourseEnrollmentNotification,
   updateCourseEnrollmentStatus,
   type CourseEnrollmentStatus,
   type CreateCourseEnrollmentInput,
 } from "../services/courseEnrollment.service";
+import { contactError } from "../utils/contact";
 
 // ----------------------------------------------------------------------
 // VALIDATION
@@ -89,12 +96,22 @@ export async function addCourseEnrollment(
   }
 
   try {
+    const invalidContact = contactError(
+      request.body.customer.email,
+      request.body.customer.phone,
+    );
+
+    if (invalidContact) {
+      response.status(400).json({ message: invalidContact });
+      return;
+    }
+
     const enrollment = await createCourseEnrollment(request.body);
 
-    void sendCourseEnrollmentNotification(enrollment).catch(
-      (error: unknown) => {
-        console.error("Telegram course enrollment notification failed:", error);
-      },
+    deliverTelegramNotificationInBackground(
+      () => sendCourseEnrollmentNotification(enrollment),
+      (notification) =>
+        saveCourseEnrollmentNotification(enrollment.id, notification),
     );
 
     response.status(201).json(enrollment);
@@ -110,6 +127,36 @@ export async function addCourseEnrollment(
 // ----------------------------------------------------------------------
 // STATUS
 // ----------------------------------------------------------------------
+
+export async function resendCourseEnrollmentToTelegram(
+  request: Request,
+  response: Response,
+) {
+  const id = Number(request.params.id);
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    response.status(400).json({ message: "Invalid enrollment id." });
+    return;
+  }
+
+  try {
+    const enrollment = await getCourseEnrollment(id);
+    const notification = await deliverTelegramNotification(() =>
+      sendCourseEnrollmentNotification(enrollment),
+    );
+    const updatedEnrollment = await saveCourseEnrollmentNotification(
+      id,
+      notification,
+    );
+
+    response.json(updatedEnrollment);
+  } catch (error) {
+    console.error("Resend enrollment notification error:", error);
+    response.status(500).json({
+      message: "Failed to send the enrollment to Telegram.",
+    });
+  }
+}
 
 export async function changeCourseEnrollmentStatus(
   request: Request,

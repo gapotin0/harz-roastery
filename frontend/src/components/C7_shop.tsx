@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
 import C7_shop_card from "./C7_shop_card";
 
 import type { CartProduct } from "../data/products";
+import { rise, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
 import arrow_scroll from "../assets/c7_arrow_scroll.svg";
@@ -161,9 +163,14 @@ const c7_sort_pannel_sort = css({
   },
 
   "& select": {
-    padding: "8px 14px",
+    appearance: "none",
+    padding: "8px 34px 8px 14px",
 
     backgroundColor: "var(--bg-card)",
+    backgroundImage: "var(--select-chevron)",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 12px center",
+    backgroundSize: "12px 8px",
     borderRadius: "100px",
     border: "1px solid var(--sand-line)",
 
@@ -173,6 +180,10 @@ const c7_sort_pannel_sort = css({
 
     outline: "none",
     cursor: "pointer",
+
+    "&::-ms-expand": {
+      display: "none",
+    },
   },
 
   "@media (max-width: 900px)": {
@@ -318,6 +329,7 @@ const arrow_left = css({
 
 function C7_shop({ language, products, addToCart }: C7Props) {
   const t = translations[language];
+  const { reduce, reveal } = useSoftMotion();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
@@ -402,51 +414,66 @@ function C7_shop({ language, products, addToCart }: C7Props) {
 
   return (
     <div id="shop" className={cx("font-onest", c7_place)}>
-      <div>
+      <motion.div variants={rise} {...reveal}>
         <h2 className={c7_title}>{t.c7.title}</h2>
         <h3 className={c7_second_title}>{t.c7.second_title}</h3>
-      </div>
+      </motion.div>
       <div className={c7_sort_pannel}>
         <div className={c7_sort_pannel_btm}>
-          <button
+          <motion.button
             type="button"
             className={activeCategory === "all" ? active_filter : undefined}
             onClick={() => handleCategoryChange("all")}
+            whileHover={reduce ? undefined : { y: -2 }}
+            whileTap={reduce ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.16 }}
           >
             {t.c7.filter_all}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             className={
               activeCategory === "single-origin" ? active_filter : undefined
             }
             onClick={() => handleCategoryChange("single-origin")}
+            whileHover={reduce ? undefined : { y: -2 }}
+            whileTap={reduce ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.16 }}
           >
             {t.c7.filter_single_origin}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             className={
               activeCategory === "espresso" ? active_filter : undefined
             }
             onClick={() => handleCategoryChange("espresso")}
+            whileHover={reduce ? undefined : { y: -2 }}
+            whileTap={reduce ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.16 }}
           >
             {t.c7.filter_espresso}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             className={activeCategory === "rare" ? active_filter : undefined}
             onClick={() => handleCategoryChange("rare")}
+            whileHover={reduce ? undefined : { y: -2 }}
+            whileTap={reduce ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.16 }}
           >
             {t.c7.filter_rare}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             className={activeCategory === "decaf" ? active_filter : undefined}
             onClick={() => handleCategoryChange("decaf")}
+            whileHover={reduce ? undefined : { y: -2 }}
+            whileTap={reduce ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.16 }}
           >
             {t.c7.filter_decaf}
-          </button>
+          </motion.button>
         </div>
         <div className={c7_sort_pannel_sort}>
           <p>{t.c7.sort_by}</p>
@@ -467,13 +494,17 @@ function C7_shop({ language, products, addToCart }: C7Props) {
         </div>
       </div>
       {currentProducts.length > 0 ? (
-        <div className={c7_market_place}>
-          {currentProducts.map((product) => (
+        <div
+          className={c7_market_place}
+          key={`${activeCategory}-${sortOption}-${currentPage}`}
+        >
+          {currentProducts.map((product, index) => (
             <C7_shop_card
               key={product.id}
               product={product}
               onAddToCart={() => addToCart(product)}
               language={language}
+              delay={index * 0.06}
             />
           ))}
         </div>
@@ -489,7 +520,7 @@ function C7_shop({ language, products, addToCart }: C7Props) {
             className={c7_pagination_arrow}
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
-            aria-label="Previous page"
+            aria-label={t.c7.previous_page}
           >
             <img
               className={cx(pagination_arrow_icon, arrow_left, "icon")}
@@ -519,7 +550,7 @@ function C7_shop({ language, products, addToCart }: C7Props) {
             className={c7_pagination_arrow}
             onClick={goToNextPage}
             disabled={currentPage === totalPages}
-            aria-label="Next page"
+            aria-label={t.c7.next_page}
           >
             <img
               className={cx(pagination_arrow_icon, "icon")}

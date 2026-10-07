@@ -3,6 +3,8 @@ import { css, cx } from "@emotion/css";
 
 import { createCustomRoastingRequest } from "../services/customRoastingApi";
 
+import { MotionDialog } from "./motion";
+
 import close_icon from "../assets/close_icon.svg";
 
 // ----------------------------------------------------------------------
@@ -608,18 +610,11 @@ function C6_CustomRoastingForm({ language, onClose }: Props) {
 
   if (isSuccess) {
     return (
-      <div
-        className={overlay}
-        onMouseDown={(event) => {
-          if (event.target === event.currentTarget) {
-            onClose();
-          }
-        }}
+      <MotionDialog
+        overlayClass={overlay}
+        panelClass={cx(modal, "font-onest")}
+        onClose={onClose}
       >
-        <div
-          className={cx(modal, "font-onest")}
-          onMouseDown={(event) => event.stopPropagation()}
-        >
           <div className={success_content}>
             <div className={success_icon}>✓</div>
 
@@ -637,24 +632,16 @@ function C6_CustomRoastingForm({ language, onClose }: Props) {
               {isUk ? "Готово" : "Done"}
             </button>
           </div>
-        </div>
-      </div>
+      </MotionDialog>
     );
   }
 
   return (
-    <div
-      className={overlay}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
+    <MotionDialog
+      overlayClass={overlay}
+      panelClass={cx(modal, "font-onest")}
+      onClose={onClose}
     >
-      <div
-        className={cx(modal, "font-onest")}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
         <div className={header}>
           <div>
             <h2>
@@ -886,8 +873,7 @@ function C6_CustomRoastingForm({ language, onClose }: Props) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </MotionDialog>
   );
 }
 

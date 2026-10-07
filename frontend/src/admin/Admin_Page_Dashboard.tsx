@@ -15,6 +15,7 @@ import type { CourseEnrollment } from "../data/courseEnrollments";
 import type { CustomRoastingRequest } from "../data/customRoasting";
 import type { Order } from "../data/orders";
 import type { CartProduct } from "../data/products";
+import { applyTheme, readTheme } from "../preferences";
 
 import {
   adminTranslations,
@@ -579,7 +580,7 @@ function AdminDashboard({
 }: Props) {
   const [page, setPage] = useState<AdminPage>("dashboard");
 
-  const [theme, setTheme] = useState<AdminTheme>("dark");
+  const [theme, setTheme] = useState<AdminTheme>(readTheme);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -726,7 +727,11 @@ function AdminDashboard({
   // ----------------------------------------------------------------------
 
   const toggleTheme = () => {
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
+    setTheme((current) => {
+      const next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      return next;
+    });
   };
 
   const toggleLanguage = () => {

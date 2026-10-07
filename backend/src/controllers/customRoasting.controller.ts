@@ -1,14 +1,21 @@
 import type { Request, Response } from "express";
 
-import { sendCustomRoastingNotification } from "../services/telegram.service";
+import {
+  deliverTelegramNotification,
+  deliverTelegramNotificationInBackground,
+  sendCustomRoastingNotification,
+} from "../services/telegram.service";
 import {
   createCustomRoastingRequest,
   deleteCustomRoastingRequest,
+  getCustomRoastingRequest,
   getCustomRoastingRequests,
+  saveCustomRoastingNotification,
   updateCustomRoastingStatus,
   type CreateCustomRoastingInput,
   type CustomRoastingStatus,
 } from "../services/customRoasting.service";
+import { contactError } from "../utils/contact";
 
 // ----------------------------------------------------------------------
 // VALIDATION
@@ -88,12 +95,22 @@ export async function addCustomRoastingRequest(
   }
 
   try {
+    const invalidContact = contactError(
+      request.body.customer.email,
+      request.body.customer.phone,
+    );
+
+    if (invalidContact) {
+      response.status(400).json({ message: invalidContact });
+      return;
+    }
+
     const createdRequest = await createCustomRoastingRequest(request.body);
 
-    void sendCustomRoastingNotification(createdRequest).catch(
-      (error: unknown) => {
-        console.error("Telegram custom roasting notification failed:", error);
-      },
+    deliverTelegramNotificationInBackground(
+      () => sendCustomRoastingNotification(createdRequest),
+      (notification) =>
+        saveCustomRoastingNotification(createdRequest.id, notification),
     );
 
     response.status(201).json(createdRequest);
@@ -108,6 +125,38 @@ export async function addCustomRoastingRequest(
 // ----------------------------------------------------------------------
 // STATUS
 // ----------------------------------------------------------------------
+
+export async function resendCustomRoastingToTelegram(
+  request: Request,
+  response: Response,
+) {
+  const id = Number(request.params.id);
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    response.status(400).json({
+      message: "Invalid custom roasting request id.",
+    });
+    return;
+  }
+
+  try {
+    const roastingRequest = await getCustomRoastingRequest(id);
+    const notification = await deliverTelegramNotification(() =>
+      sendCustomRoastingNotification(roastingRequest),
+    );
+    const updatedRequest = await saveCustomRoastingNotification(
+      id,
+      notification,
+    );
+
+    response.json(updatedRequest);
+  } catch (error) {
+    console.error("Resend custom roasting notification error:", error);
+    response.status(500).json({
+      message: "Failed to send the roasting request to Telegram.",
+    });
+  }
+}
 
 export async function changeCustomRoastingStatus(
   request: Request,

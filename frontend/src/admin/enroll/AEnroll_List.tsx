@@ -13,6 +13,8 @@ type Props = {
   enrollments: CourseEnrollment[];
   onStatusChange: (id: number, status: CourseEnrollmentStatus) => void;
   onDelete: (id: number) => void;
+  onResend: (id: number) => void;
+  resendingId: number | null;
 };
 
 const list = css({
@@ -30,6 +32,8 @@ function AEnroll_List({
   enrollments,
   onStatusChange,
   onDelete,
+  onResend,
+  resendingId,
 }: Props) {
   return (
     <div className={list}>
@@ -40,6 +44,8 @@ function AEnroll_List({
           enrollment={enrollment}
           onStatusChange={onStatusChange}
           onDelete={onDelete}
+          onResend={onResend}
+          isResending={resendingId === enrollment.id}
         />
       ))}
     </div>

@@ -1,7 +1,9 @@
 import { css, cx } from "@emotion/css";
+import { motion, useReducedMotion } from "motion/react";
 
 import type { CartProduct } from "../data/products";
-// import { translations } from "./translations";
+import { hoverImage, liftCard } from "./motion";
+import { roastLabel } from "./translations";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -11,6 +13,7 @@ type Props = {
   product: CartProduct;
   onAddToCart: () => void;
   language: "en" | "uk";
+  delay?: number;
 };
 
 // ----------------------------------------------------------------------
@@ -238,15 +241,25 @@ const add_button = css({
 // COMPONENT
 // ----------------------------------------------------------------------
 
-function C7_shop_card({ product, onAddToCart, language }: Props) {
-  // const t = translations[language];
+function C7_shop_card({ product, onAddToCart, language, delay = 0 }: Props) {
+  const reduce = Boolean(useReducedMotion());
 
   return (
-    <article className={c7_card}>
+    <motion.article
+      className={c7_card}
+      custom={delay}
+      variants={liftCard}
+      initial={reduce ? false : "hidden"}
+      animate="show"
+      whileHover={reduce || !product.inStock ? undefined : "hover"}
+    >
       <div className={c7_card_image}>
-        <img
+        <motion.img
+          variants={hoverImage}
           src={product.image || PLACEHOLDER_IMAGE}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           onError={(event) => {
             event.currentTarget.onerror = null;
             event.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -260,7 +273,7 @@ function C7_shop_card({ product, onAddToCart, language }: Props) {
               className={c7_card_dot}
               style={{ backgroundColor: product.roastColor }}
             />
-            <p>{product.roast}</p>
+            <p>{roastLabel(product.roast, language)}</p>
           </div>
           <h4 className={product_name}>{product.name}</h4>
           <p className={product_description}>{product.description[language]}</p>
@@ -279,11 +292,16 @@ function C7_shop_card({ product, onAddToCart, language }: Props) {
         </div>
         <div className={c7_card_info_bot}>
           <p className={product_price}>₴{product.price}</p>
-          <button
+          <motion.button
             type="button"
             className={add_button}
             onClick={onAddToCart}
             disabled={!product.inStock}
+            whileHover={
+              reduce || !product.inStock ? undefined : { scale: 1.03 }
+            }
+            whileTap={reduce || !product.inStock ? undefined : { scale: 0.97 }}
+            transition={{ duration: 0.16 }}
           >
             {product.inStock && product.stock > 0
               ? language === "uk"
@@ -292,10 +310,10 @@ function C7_shop_card({ product, onAddToCart, language }: Props) {
               : language === "uk"
                 ? "Немає в наявності"
                 : "Out of stock"}
-          </button>
+            </motion.button>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 

@@ -1,3 +1,5 @@
+import type { TelegramNotification } from "./telegramNotification";
+
 export type OrderStatus =
   | "new"
   | "processing"
@@ -32,4 +34,5 @@ export type Order = {
   items: OrderItem[];
   total: number;
   status: OrderStatus;
+  notification?: TelegramNotification;
 };

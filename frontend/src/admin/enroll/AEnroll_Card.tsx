@@ -1,5 +1,6 @@
 import { css } from "@emotion/css";
 
+import ATelegramNotice from "../ATelegramNotice";
 import AEnroll_StatusSelect from "./AEnroll_StatusSelect";
 
 import type {
@@ -20,6 +21,8 @@ type Props = {
   enrollment: CourseEnrollment;
   onStatusChange: (id: number, status: CourseEnrollmentStatus) => void;
   onDelete: (id: number) => void;
+  onResend: (id: number) => void;
+  isResending: boolean;
 };
 
 // ----------------------------------------------------------------------
@@ -151,6 +154,8 @@ function AEnroll_Card({
   enrollment,
   onStatusChange,
   onDelete,
+  onResend,
+  isResending,
 }: Props) {
   const t = adminTranslations[language].enrollments;
   const createdAt = new Date(enrollment.createdAt).toLocaleString(
@@ -171,6 +176,12 @@ function AEnroll_Card({
             {" · "}
             {createdAt}
           </p>
+          <ATelegramNotice
+            language={language}
+            notification={enrollment.notification}
+            isSending={isResending}
+            onResend={() => onResend(enrollment.id)}
+          />
         </div>
         <AEnroll_StatusSelect
           language={language}

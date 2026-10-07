@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { getDownloadURL } from "firebase-admin/storage";
 
 import { firebaseStorage } from "../config/firebase";
+import { optimizeImageToWebp } from "./optimizeImage";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -13,29 +14,18 @@ export type FirebaseImageUploadResult = {
   storagePath: string;
 };
 
-type SupportedImageType = "image/webp" | "image/jpeg" | "image/png";
-
 // ----------------------------------------------------------------------
 // CONFIG
 // ----------------------------------------------------------------------
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-
-const EXTENSIONS: Record<SupportedImageType, string> = {
-  "image/webp": "webp",
-  "image/jpeg": "jpg",
-  "image/png": "png",
-};
+const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
 
 // ----------------------------------------------------------------------
 // HELPERS
 // ----------------------------------------------------------------------
 
-function parseImageDataUrl(dataUrl: string): {
-  buffer: Buffer;
-  contentType: SupportedImageType;
-} {
-  const match = dataUrl.match(/^data:(image\/(?:webp|jpeg|png));base64,(.+)$/);
+function parseImageDataUrl(dataUrl: string): Buffer {
+  const match = dataUrl.match(/^data:image\/(?:webp|jpeg|png);base64,(.+)$/);
 
   if (!match) {
     throw new Error(
@@ -43,18 +33,17 @@ function parseImageDataUrl(dataUrl: string): {
     );
   }
 
-  const contentType = match[1] as SupportedImageType;
-  const buffer = Buffer.from(match[2], "base64");
+  const buffer = Buffer.from(match[1], "base64");
 
   if (buffer.length === 0) {
     throw new Error("Image is empty.");
   }
 
   if (buffer.length > MAX_IMAGE_SIZE) {
-    throw new Error("Image is too large. Maximum size is 5 MB.");
+    throw new Error("Image is too large. Maximum size is 8 MB.");
   }
 
-  return { buffer, contentType };
+  return buffer;
 }
 
 // ----------------------------------------------------------------------
@@ -64,9 +53,9 @@ function parseImageDataUrl(dataUrl: string): {
 export async function uploadProductImageToFirebase(
   dataUrl: string,
 ): Promise<FirebaseImageUploadResult> {
-  const { buffer, contentType } = parseImageDataUrl(dataUrl);
-  const extension = EXTENSIONS[contentType];
-  const storagePath = `products/${randomUUID()}.${extension}`;
+  const source = parseImageDataUrl(dataUrl);
+  const buffer = await optimizeImageToWebp(source);
+  const storagePath = `products/${randomUUID()}.webp`;
 
   const bucket = firebaseStorage.bucket();
   const file = bucket.file(storagePath);
@@ -74,7 +63,7 @@ export async function uploadProductImageToFirebase(
   await file.save(buffer, {
     resumable: false,
     metadata: {
-      contentType,
+      contentType: "image/webp",
       cacheControl: "public, max-age=31536000, immutable",
     },
   });

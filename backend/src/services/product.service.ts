@@ -87,16 +87,10 @@ export async function updateProduct(
   await document.set(updatedProduct, { merge: false });
 
   const imageChanged = previousProduct.image !== updatedProduct.image;
-  const previousImageExists = Boolean(
-    previousProduct.imageStoragePath || previousProduct.imagePublicId,
-  );
 
-  if (imageChanged && previousImageExists) {
+  if (imageChanged && previousProduct.imageStoragePath) {
     try {
-      await deleteProductImage({
-        storagePath: previousProduct.imageStoragePath,
-        publicId: previousProduct.imagePublicId,
-      });
+      await deleteProductImage(previousProduct.imageStoragePath);
     } catch (error) {
       console.error("Failed to remove old product image:", error);
     }
@@ -121,16 +115,9 @@ export async function deleteProduct(id: number): Promise<void> {
 
   await document.delete();
 
-  const productImageExists = Boolean(
-    product.imageStoragePath || product.imagePublicId,
-  );
-
-  if (productImageExists) {
+  if (product.imageStoragePath) {
     try {
-      await deleteProductImage({
-        storagePath: product.imageStoragePath,
-        publicId: product.imagePublicId,
-      });
+      await deleteProductImage(product.imageStoragePath);
     } catch (error) {
       console.error("Failed to remove product image:", error);
     }
@@ -163,15 +150,12 @@ export async function resetProducts(): Promise<Product[]> {
   await batch.commit();
 
   for (const product of previousProducts) {
-    if (!product.imageStoragePath && !product.imagePublicId) {
+    if (!product.imageStoragePath) {
       continue;
     }
 
     try {
-      await deleteProductImage({
-        storagePath: product.imageStoragePath,
-        publicId: product.imagePublicId,
-      });
+      await deleteProductImage(product.imageStoragePath);
     } catch (error) {
       console.error(`Failed to remove image for product ${product.id}:`, error);
     }

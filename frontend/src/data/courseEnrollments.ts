@@ -1,3 +1,5 @@
+import type { TelegramNotification } from "./telegramNotification";
+
 export type CourseEnrollmentStatus =
   | "new"
   | "contacted"
@@ -20,4 +22,5 @@ export type CourseEnrollment = {
     phone: string;
   };
   status: CourseEnrollmentStatus;
+  notification?: TelegramNotification;
 };

@@ -27,6 +27,15 @@ export const adminTranslations = {
       logout: "Log out",
     },
 
+    telegram: {
+      sent: "Sent to Telegram",
+      failed: "Not sent to Telegram",
+      pending: "Sending to Telegram",
+      missing: "Not sent to Telegram",
+      resend: "Send again",
+      sending: "Sending...",
+    },
+
     dashboard: {
       title: "Dashboard",
 
@@ -386,6 +395,15 @@ export const adminTranslations = {
       customRoasting: "Індивідуальне обсмажування",
 
       logout: "Вийти",
+    },
+
+    telegram: {
+      sent: "Надіслано в Telegram",
+      failed: "Не надіслано в Telegram",
+      pending: "Надсилання в Telegram",
+      missing: "Не надіслано в Telegram",
+      resend: "Надіслати ще раз",
+      sending: "Надсилання...",
     },
 
     dashboard: {

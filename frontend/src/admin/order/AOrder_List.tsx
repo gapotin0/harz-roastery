@@ -10,6 +10,8 @@ type Props = {
   orders: Order[];
   onStatusChange: (orderId: number, status: OrderStatus) => void;
   onDelete: (orderId: number) => void;
+  onResend: (orderId: number) => void;
+  resendingId: number | null;
 };
 
 const list = css({
@@ -18,7 +20,14 @@ const list = css({
   gap: "16px",
 });
 
-function AOrder_List({ language, orders, onStatusChange, onDelete }: Props) {
+function AOrder_List({
+  language,
+  orders,
+  onStatusChange,
+  onDelete,
+  onResend,
+  resendingId,
+}: Props) {
   return (
     <div className={list}>
       {orders.map((order) => (
@@ -28,6 +37,8 @@ function AOrder_List({ language, orders, onStatusChange, onDelete }: Props) {
           order={order}
           onStatusChange={onStatusChange}
           onDelete={onDelete}
+          onResend={onResend}
+          isResending={resendingId === order.id}
         />
       ))}
     </div>

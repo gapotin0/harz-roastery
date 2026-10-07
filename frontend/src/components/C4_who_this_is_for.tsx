@@ -1,5 +1,7 @@
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
+import { hoverImage, liftCard, rise, stagger, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
 import icon1 from "../assets/c4_icons/c4_icon1.svg";
@@ -139,45 +141,46 @@ const c4_card_place = css({
 
 function C4_who_this_is_for({ language }: C4Props) {
   const t = translations[language];
+  const { reduce, reveal } = useSoftMotion();
 
   return (
     <div className={cx(c4_place, "font-onest")}>
-      <div>
+      <motion.div variants={rise} {...reveal}>
         <h2 className={c4_title}>{t.c4.title}</h2>
         <h3 className={c4_second_title}>{t.c4.second_title}</h3>
-      </div>
-      <div className={c4_card_place}>
-        <div>
-          <img src={icon1} alt={t.c4.c1_title} />
+      </motion.div>
+      <motion.div className={c4_card_place} variants={stagger} {...reveal}>
+        <motion.div variants={liftCard} whileHover={reduce ? undefined : "hover"}>
+          <motion.img variants={hoverImage} src={icon1} alt={t.c4.c1_title} />
           <h3>{t.c4.c1_title}</h3>
           <p>{t.c4.c1_text}</p>
-        </div>
-        <div>
-          <img src={icon2} alt={t.c4.c2_title} />
+        </motion.div>
+        <motion.div variants={liftCard} whileHover={reduce ? undefined : "hover"}>
+          <motion.img variants={hoverImage} src={icon2} alt={t.c4.c2_title} />
           <h3>{t.c4.c2_title}</h3>
           <p>{t.c4.c2_text}</p>
-        </div>
-        <div>
-          <img src={icon3} alt={t.c4.c3_title} />
+        </motion.div>
+        <motion.div variants={liftCard} whileHover={reduce ? undefined : "hover"}>
+          <motion.img variants={hoverImage} src={icon3} alt={t.c4.c3_title} />
           <h3>{t.c4.c3_title}</h3>
           <p>{t.c4.c3_text}</p>
-        </div>
-        <div>
-          <img src={icon4} alt={t.c4.c4_title} />
+        </motion.div>
+        <motion.div variants={liftCard} whileHover={reduce ? undefined : "hover"}>
+          <motion.img variants={hoverImage} src={icon4} alt={t.c4.c4_title} />
           <h3>{t.c4.c4_title}</h3>
           <p>{t.c4.c4_text}</p>
-        </div>
-        <div>
-          <img src={icon5} alt={t.c4.c5_title} />
+        </motion.div>
+        <motion.div variants={liftCard} whileHover={reduce ? undefined : "hover"}>
+          <motion.img variants={hoverImage} src={icon5} alt={t.c4.c5_title} />
           <h3>{t.c4.c5_title}</h3>
           <p>{t.c4.c5_text}</p>
-        </div>
-        <div>
-          <img src={icon6} alt={t.c4.c6_title} />
+        </motion.div>
+        <motion.div variants={liftCard} whileHover={reduce ? undefined : "hover"}>
+          <motion.img variants={hoverImage} src={icon6} alt={t.c4.c6_title} />
           <h3>{t.c4.c6_title}</h3>
           <p>{t.c4.c6_text}</p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

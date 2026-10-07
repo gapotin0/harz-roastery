@@ -1,11 +1,10 @@
+import { API_URL } from "./apiBase";
 import { auth } from "./firebase";
 
 import type {
   CustomRoastingRequest,
   CustomRoastingStatus,
 } from "../data/customRoasting";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 export type CreateCustomRoastingInput = {
   customer: {
@@ -100,6 +99,27 @@ export async function updateCustomRoastingStatus(
 
     throw new Error(
       errorData?.message ?? "Failed to update custom roasting request.",
+    );
+  }
+
+  return (await response.json()) as CustomRoastingRequest;
+}
+
+export async function resendCustomRoastingNotification(
+  id: number,
+): Promise<CustomRoastingRequest> {
+  const token = await getAdminToken();
+
+  const response = await fetch(`${API_URL}/api/custom-roasting/${id}/notify`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+
+    throw new Error(
+      errorData?.message ?? "Failed to send the roasting request to Telegram.",
     );
   }
 

@@ -1,8 +1,11 @@
+import { useState } from "react";
+
 import AEnroll_EmptyState from "./enroll/AEnroll_EmptyState";
 import AEnroll_List from "./enroll/AEnroll_List";
 
 import {
   deleteCourseEnrollment,
+  resendCourseEnrollmentNotification,
   updateCourseEnrollmentStatus,
 } from "../services/courseEnrollmentApi";
 
@@ -29,6 +32,7 @@ function AdminCourseEnrollments({
   isLoading,
 }: Props) {
   const t = adminTranslations[language].enrollments;
+  const [resendingId, setResendingId] = useState<number | null>(null);
 
   // ----------------------------------------------------------------------
   // STATUS
@@ -43,7 +47,7 @@ function AdminCourseEnrollments({
       setEnrollments((currentEnrollments) =>
         currentEnrollments.map((enrollment) =>
           enrollment.id === updatedEnrollment.id
-            ? updatedEnrollment
+            ? { ...enrollment, status: updatedEnrollment.status }
             : enrollment,
         ),
       );
@@ -53,6 +57,35 @@ function AdminCourseEnrollments({
       window.alert(
         error instanceof Error ? error.message : "Failed to update enrollment.",
       );
+    }
+  };
+
+  // ----------------------------------------------------------------------
+  // TELEGRAM
+  // ----------------------------------------------------------------------
+
+  const handleResend = async (id: number) => {
+    setResendingId(id);
+
+    try {
+      const updatedEnrollment = await resendCourseEnrollmentNotification(id);
+      setEnrollments((currentEnrollments) =>
+        currentEnrollments.map((enrollment) =>
+          enrollment.id === updatedEnrollment.id
+            ? updatedEnrollment
+            : enrollment,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to resend enrollment notification:", error);
+
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to send the enrollment to Telegram.",
+      );
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -109,6 +142,8 @@ function AdminCourseEnrollments({
       enrollments={enrollments}
       onStatusChange={handleStatusChange}
       onDelete={handleDelete}
+      onResend={handleResend}
+      resendingId={resendingId}
     />
   );
 }

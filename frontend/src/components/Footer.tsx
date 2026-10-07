@@ -1,5 +1,8 @@
+import { Link } from "react-router-dom";
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
+import { rise, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
 import logo_minimal from "../assets/logo_minimal.svg";
@@ -194,6 +197,16 @@ const footer_bot = css({
     gap: "16px",
   },
 
+  "& a": {
+    color: "var(--text-muted)",
+    fontSize: "13px",
+    textDecoration: "none",
+
+    "&:hover": {
+      color: "var(--text-main)",
+    },
+  },
+
   "@media (max-width: 700px)": {
     flexDirection: "column",
     alignItems: "flex-start",
@@ -207,7 +220,7 @@ const footer_bot = css({
   "@media (max-width: 480px)": {
     paddingTop: "24px",
 
-    "& p": {
+    "& p, & a": {
       fontSize: "12px",
     },
 
@@ -224,9 +237,14 @@ const footer_bot = css({
 
 function Footer({ language }: FooterProps) {
   const t = translations[language];
+  const { reveal } = useSoftMotion();
 
   return (
-    <div className={cx("font-onest", footer_place)}>
+    <motion.div
+      className={cx("font-onest", footer_place)}
+      variants={rise}
+      {...reveal}
+    >
       <div className={footer_top}>
         <div className={footer_t_l}>
           <div>
@@ -251,11 +269,11 @@ function Footer({ language }: FooterProps) {
       <div className={footer_bot}>
         <p>{t.footer.copyright}</p>
         <div>
-          <p>{t.footer.privacy}</p>
-          <p>{t.footer.terms}</p>
+          <Link to="/privacy">{t.footer.privacy}</Link>
+          <Link to="/terms">{t.footer.terms}</Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

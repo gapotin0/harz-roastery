@@ -1,8 +1,10 @@
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
+import { rise, stagger, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
-import photo from "../assets/с2_photo.png";
+import photo from "../assets/who-we-are.webp";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -137,19 +139,24 @@ const c2_text_muted = css({
 
 function C2_who_we_are({ language }: C2Props) {
   const t = translations[language];
+  const { reveal } = useSoftMotion();
 
   return (
-    <div className={cx("font-onest", c2_place)}>
-      <div className={c2_left}>
-        <img src={photo} alt="Photo" />
-      </div>
-      <div className={c2_right}>
+    <motion.div
+      className={cx("font-onest", c2_place)}
+      variants={stagger}
+      {...reveal}
+    >
+      <motion.div className={c2_left} variants={rise}>
+        <img src={photo} alt="Photo" loading="lazy" decoding="async" />
+      </motion.div>
+      <motion.div className={c2_right} variants={rise}>
         <h2 className={c2_title}>{t.c2.title}</h2>
         <h3 className={c2_second_title}>{t.c2.second_title}</h3>
         <p className={c2_text}>{t.c2.text}</p>
         <p className={c2_text_muted}>{t.c2.text_muted}</p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

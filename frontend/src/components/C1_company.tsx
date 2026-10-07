@@ -1,8 +1,10 @@
 import { css, cx } from "@emotion/css";
+import { motion, useReducedMotion } from "motion/react";
 
+import { rise, softEase, stagger } from "./motion";
 import { translations } from "./translations";
 
-import logo from "../assets/Logo.svg";
+import logo from "../assets/logo.webp";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -226,11 +228,17 @@ const secondary_button = css({
 
 function Component1({ language }: Component1Props) {
   const t = translations[language];
+  const reduce = Boolean(useReducedMotion());
 
   return (
     <div id="about" className={cx("font-onest", component1_place)}>
-      <div className={left_content}>
-        <div className={lc_text}>
+      <motion.div
+        className={left_content}
+        variants={stagger}
+        initial={reduce ? false : "hidden"}
+        animate="show"
+      >
+        <motion.div className={lc_text} variants={rise}>
           <h2 className={main_title}>
             {t.c1.text_before_accent}
             <span
@@ -242,19 +250,51 @@ function Component1({ language }: Component1Props) {
             {t.c1.text_after_accent}
           </h2>
           <h3 className={description}>{t.c1.additional_text}</h3>
-        </div>
-        <div className={lc_buttons}>
+        </motion.div>
+        <motion.div className={lc_buttons} variants={rise}>
           <a href="#shop">
-            <button className={primary_button}>{t.c1.btm1_shop}</button>
+            <motion.button
+              className={primary_button}
+              whileHover={reduce ? undefined : { scale: 1.04 }}
+              whileTap={reduce ? undefined : { scale: 0.97 }}
+              transition={{ duration: 0.18 }}
+            >
+              {t.c1.btm1_shop}
+            </motion.button>
           </a>
           <a href="#courses">
-            <button className={secondary_button}>{t.c1.btm2_courses}</button>
+            <motion.button
+              className={secondary_button}
+              whileHover={reduce ? undefined : { scale: 1.04 }}
+              whileTap={reduce ? undefined : { scale: 0.97 }}
+              transition={{ duration: 0.18 }}
+            >
+              {t.c1.btm2_courses}
+            </motion.button>
           </a>
-        </div>
-      </div>
-      <div className={image_circle}>
-        <img src={logo} alt="Logo" />
-      </div>
+        </motion.div>
+      </motion.div>
+      <motion.div
+        className={image_circle}
+        initial={reduce ? false : { opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: reduce ? 0 : 0.8,
+          ease: softEase,
+          delay: reduce ? 0 : 0.12,
+        }}
+      >
+        <motion.img
+          src={logo}
+          alt="Logo"
+          animate={reduce ? undefined : { y: [0, -8, 0] }}
+          transition={
+            reduce
+              ? undefined
+              : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+          }
+        />
+      </motion.div>
     </div>
   );
 }

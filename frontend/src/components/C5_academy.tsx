@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
 import C5_academy_card from "./C5_academy_card";
 
 import type { Course } from "../data/courses";
+import { liftCard, rise, stagger, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
 import icon from "../assets/c5_icon.svg";
@@ -95,12 +97,10 @@ const c5_card_place = css({
     textAlign: "left",
 
     cursor: "pointer",
-    transition:
-      "transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease",
+    transition: "border-color 0.15s ease, background-color 0.15s ease",
 
     "&:hover": {
       borderColor: "var(--clay)",
-      transform: "translateY(-2px)",
     },
 
     "@media (max-width: 768px)": {
@@ -230,6 +230,7 @@ const empty_state = css({
 
 function C5_academy({ language, courses }: C5Props) {
   const t = translations[language];
+  const { reduce, reveal } = useSoftMotion();
 
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
@@ -242,24 +243,27 @@ function C5_academy({ language, courses }: C5Props) {
 
   return (
     <div id="courses" className={cx(c5_place, "font-onest")}>
-      <div>
+      <motion.div variants={rise} {...reveal}>
         <h2 className={c5_title}>{t.c5.title}</h2>
         <h3 className={c5_second_title}>{t.c5.second_title}</h3>
-      </div>
+      </motion.div>
       {activeCourses.length === 0 ? (
-        <div className={empty_state}>
+        <motion.div className={empty_state} variants={rise} {...reveal}>
           <p>
             {language === "uk"
               ? "Наразі доступних курсів немає."
               : "There are currently no available courses."}
           </p>
-        </div>
+        </motion.div>
       ) : (
-        <div className={c5_card_place}>
+        <motion.div className={c5_card_place} variants={stagger} {...reveal}>
           {activeCourses.map((course) => (
-            <button
+            <motion.button
               key={course.id}
               type="button"
+              variants={liftCard}
+              whileHover={reduce ? undefined : "hover"}
+              whileTap={reduce ? undefined : { scale: 0.985 }}
               onClick={() => setSelectedCourseId(course.id)}
             >
               <div className={c5_card}>
@@ -277,9 +281,9 @@ function C5_academy({ language, courses }: C5Props) {
                   </div>
                 </div>
               </div>
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
       )}
       {selectedCourse && (
         <C5_academy_card

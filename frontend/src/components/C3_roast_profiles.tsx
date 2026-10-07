@@ -1,5 +1,7 @@
 import { css, cx } from "@emotion/css";
+import { motion } from "motion/react";
 
+import { liftCard, rise, stagger, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
 // ----------------------------------------------------------------------
@@ -178,15 +180,20 @@ const c3_card_bottom = css({
 
 function C3_roast_profiles({ language }: C3Props) {
   const t = translations[language];
+  const { reduce, reveal } = useSoftMotion();
 
   return (
     <div id="coffee" className={cx("font-onest", c3_place)}>
-      <div>
+      <motion.div variants={rise} {...reveal}>
         <h2 className={c3_title}>{t.c3.title}</h2>
         <h3 className={c3_second_title}>{t.c3.second_title}</h3>
-      </div>
-      <div className={c3_card_place}>
-        <div className={c3_card}>
+      </motion.div>
+      <motion.div className={c3_card_place} variants={stagger} {...reveal}>
+        <motion.div
+          className={c3_card}
+          variants={liftCard}
+          whileHover={reduce ? undefined : "hover"}
+        >
           <div className={c3_card_top}>
             <div
               style={{ backgroundColor: "#D9A96E" }}
@@ -201,8 +208,12 @@ function C3_roast_profiles({ language }: C3Props) {
             <div>{t.c3.d1_3}</div>
             <div>{t.c3.d1_4}</div>
           </div>
-        </div>
-        <div className={c3_card}>
+        </motion.div>
+        <motion.div
+          className={c3_card}
+          variants={liftCard}
+          whileHover={reduce ? undefined : "hover"}
+        >
           <div className={c3_card_top}>
             <div
               style={{ backgroundColor: "#B5563C" }}
@@ -217,8 +228,12 @@ function C3_roast_profiles({ language }: C3Props) {
             <div>{t.c3.d2_3}</div>
             <div>{t.c3.d2_4}</div>
           </div>
-        </div>
-        <div className={c3_card}>
+        </motion.div>
+        <motion.div
+          className={c3_card}
+          variants={liftCard}
+          whileHover={reduce ? undefined : "hover"}
+        >
           <div className={c3_card_top}>
             <div
               style={{ backgroundColor: "#5C3624" }}
@@ -233,8 +248,8 @@ function C3_roast_profiles({ language }: C3Props) {
             <div>{t.c3.d3_3}</div>
             <div>{t.c3.d3_4}</div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

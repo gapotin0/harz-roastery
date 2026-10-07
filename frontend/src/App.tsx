@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Header from "./components/Header";
@@ -10,7 +10,9 @@ import C5_academy from "./components/C5_academy";
 import C6_custom_roasting from "./components/C6_custom_roasting";
 import C7_shop from "./components/C7_shop";
 import Footer from "./components/Footer";
+import LegalPage from "./components/LegalPage";
 import AdminPanel from "./admin/AdminPanel";
+import { applyLanguage, readLanguage, type SiteLanguage } from "./preferences";
 
 import { getCourses } from "./services/courseApi";
 import { getProducts } from "./services/productApi";
@@ -32,7 +34,18 @@ type MainSiteProps = {
 };
 
 function MainSite({ products, courses, refreshProducts }: MainSiteProps) {
-  const [language, setLanguage] = useState<"en" | "uk">("en");
+  const [language, setLanguageState] = useState<SiteLanguage>(readLanguage);
+  const setLanguage: Dispatch<SetStateAction<SiteLanguage>> = (value) => {
+    setLanguageState((current) => {
+      const next = typeof value === "function" ? value(current) : value;
+      applyLanguage(next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
   const [cartItems, setCartItems] = useState<OrderItem[]>([]);
 
   const clearCart = () => {
@@ -240,6 +253,8 @@ function App() {
             />
           }
         />
+        <Route path="/privacy" element={<LegalPage page="privacy" />} />
+        <Route path="/terms" element={<LegalPage page="terms" />} />
         <Route
           path="/admin"
           element={

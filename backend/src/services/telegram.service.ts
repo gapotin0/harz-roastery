@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import type { TelegramNotification } from "../types/telegramNotification";
 import type { CourseEnrollment } from "./courseEnrollment.service";
 import type { CustomRoastingRequest } from "./customRoasting.service";
 import type { Order } from "./order.service";
@@ -30,27 +31,32 @@ type CustomRoastingNotificationData = Pick<
 // ----------------------------------------------------------------------
 
 function getTelegramConfig() {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const recipientIds = (process.env.TELEGRAM_RECIPIENT_IDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
 
   if (!botToken) {
     throw new Error("TELEGRAM_BOT_TOKEN is not configured.");
   }
 
-  if (!chatId) {
-    throw new Error("TELEGRAM_CHAT_ID is not configured.");
+  if (recipientIds.length === 0) {
+    throw new Error("TELEGRAM_RECIPIENT_IDS is not configured.");
   }
 
-  return { botToken, chatId };
+  return { botToken, recipientIds };
 }
 
 // ----------------------------------------------------------------------
 // SEND MESSAGE
 // ----------------------------------------------------------------------
 
-export async function sendTelegramMessage(text: string): Promise<void> {
-  const { botToken, chatId } = getTelegramConfig();
-
+async function sendTelegramMessageToChat(
+  botToken: string,
+  chatId: string,
+  text: string,
+): Promise<void> {
   const response = await fetch(
     `https://api.telegram.org/bot${botToken}/sendMessage`,
     {
@@ -68,6 +74,41 @@ export async function sendTelegramMessage(text: string): Promise<void> {
         `Telegram API request failed with status ${response.status}.`,
     );
   }
+}
+
+export async function sendTelegramMessage(text: string): Promise<void> {
+  const { botToken, recipientIds } = getTelegramConfig();
+  const errors: string[] = [];
+
+  for (const chatId of recipientIds) {
+    try {
+      await sendTelegramMessageToChat(botToken, chatId, text);
+    } catch (error) {
+      errors.push(`${chatId}: ${errorMessage(error)}`);
+    }
+  }
+
+  if (errors.length === 0) {
+    return;
+  }
+
+  const error = new Error(errors.join("; "));
+  const everyErrorIsPermanent = errors.every((item) =>
+    isPermanentTelegramError(item),
+  );
+
+  // A recipient who has not pressed Start should not make us send the
+  // same order again to everyone who already received it.
+  if (everyErrorIsPermanent && errors.length < recipientIds.length) {
+    console.error("Some Telegram recipients were skipped:", error.message);
+    return;
+  }
+
+  if (everyErrorIsPermanent) {
+    error.name = "PermanentTelegramError";
+  }
+
+  throw error;
 }
 
 // ----------------------------------------------------------------------
@@ -169,4 +210,84 @@ export async function sendCustomRoastingNotification(
   ].join("\n");
 
   await sendTelegramMessage(message);
+}
+
+// ----------------------------------------------------------------------
+// DELIVERY
+// ----------------------------------------------------------------------
+
+const MAX_ATTEMPTS = 3;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown Telegram error.";
+}
+
+function isPermanentTelegramError(message: string): boolean {
+  return (
+    message.includes("chat not found") ||
+    message.includes("bot was blocked by the user") ||
+    message.includes("user is deactivated")
+  );
+}
+
+function isConfigError(error: unknown): boolean {
+  return (
+    errorMessage(error).includes("is not configured") ||
+    (error instanceof Error && error.name === "PermanentTelegramError")
+  );
+}
+
+export async function deliverTelegramNotification(
+  send: () => Promise<void>,
+): Promise<TelegramNotification> {
+  let lastError = "Unknown Telegram error.";
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      await send();
+
+      return {
+        status: "sent",
+        attempts: attempt,
+        sentAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      lastError = errorMessage(error);
+      console.error(`Telegram notification attempt ${attempt} failed:`, error);
+
+      if (isConfigError(error) || attempt === MAX_ATTEMPTS) {
+        return {
+          status: "failed",
+          attempts: attempt,
+          error: lastError,
+        };
+      }
+
+      await delay(1000 * attempt);
+    }
+  }
+
+  return {
+    status: "failed",
+    attempts: MAX_ATTEMPTS,
+    error: lastError,
+  };
+}
+
+export function deliverTelegramNotificationInBackground(
+  send: () => Promise<void>,
+  save: (notification: TelegramNotification) => Promise<unknown>,
+): void {
+  void (async () => {
+    const notification = await deliverTelegramNotification(send);
+    await save(notification);
+  })().catch((error: unknown) => {
+    console.error("Failed to store Telegram notification status:", error);
+  });
 }

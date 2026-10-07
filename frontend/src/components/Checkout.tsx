@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { css, cx } from "@emotion/css";
 
 import { createOrder } from "../services/orderApi";
+import { roastLabel } from "./translations";
 
 import close_icon from "../assets/close_icon.svg";
 
@@ -649,7 +650,7 @@ function Checkout({
                     </span>
 
                     <span className={item_details}>
-                      {item.roast} · {item.weight}
+                      {roastLabel(item.roast, language)} · {item.weight}
                     </span>
                   </div>
 

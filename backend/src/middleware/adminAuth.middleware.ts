@@ -18,18 +18,15 @@ export async function requireAdmin(
 
   try {
     const decodedToken = await firebaseAuth.verifyIdToken(token);
+    const allowedUids = new Set(
+      (process.env.ADMIN_UID ?? "")
+        .split(",")
+        .map((uid) => uid.trim())
+        .filter((uid) => uid.length > 0),
+    );
+    const hasAdminClaim = decodedToken.admin === true;
 
-    const adminUid = process.env.ADMIN_UID;
-
-    if (!adminUid) {
-      console.error("ADMIN_UID is not configured.");
-      response.status(500).json({
-        message: "Admin authorization is not configured.",
-      });
-      return;
-    }
-
-    if (decodedToken.uid !== adminUid) {
+    if (!hasAdminClaim && !allowedUids.has(decodedToken.uid)) {
       response.status(403).json({ message: "Admin access required." });
       return;
     }

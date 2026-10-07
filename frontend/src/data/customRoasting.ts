@@ -1,3 +1,5 @@
+import type { TelegramNotification } from "./telegramNotification";
+
 export type CustomRoastingStatus =
   | "new"
   | "contacted"
@@ -21,4 +23,5 @@ export type CustomRoastingRequest = {
   };
   message: string;
   status: CustomRoastingStatus;
+  notification?: TelegramNotification;
 };

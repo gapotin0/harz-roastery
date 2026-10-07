@@ -1,8 +1,7 @@
+import { API_URL } from "./apiBase";
 import { auth } from "./firebase";
 
 import type { CartProduct } from "../data/products";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 async function getAdminToken(): Promise<string> {
   const user = auth.currentUser;

@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { css, cx } from "@emotion/css";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import Checkout from "./Checkout";
 
 import type { OrderItem } from "../data/orders";
-import { translations } from "./translations";
+import { softEase } from "./motion";
+import { roastLabel, translations } from "./translations";
 
 import close_icon from "../assets/close_icon.svg";
 
@@ -60,18 +62,6 @@ const order_place = css({
   boxShadow: "-20px 0 50px rgba(0, 0, 0, 0.25)",
 
   color: "var(--text-main)",
-
-  animation: "slideInRight 0.25s ease",
-
-  "@keyframes slideInRight": {
-    from: {
-      transform: "translateX(100%)",
-    },
-
-    to: {
-      transform: "translateX(0)",
-    },
-  },
 
   "@media (max-width: 600px)": {
     maxWidth: "100%",
@@ -425,6 +415,17 @@ function C7_order_place({
   const t = translations[language];
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [present, setPresent] = useState(true);
+  const reduceMotion = Boolean(useReducedMotion());
+
+  const requestClose = useCallback(() => {
+    if (reduceMotion) {
+      onClose();
+      return;
+    }
+
+    setPresent(false);
+  }, [onClose, reduceMotion]);
 
   // Lock page scrolling while the cart is open.
   useEffect(() => {
@@ -440,7 +441,7 @@ function C7_order_place({
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        requestClose();
       }
     };
 
@@ -449,7 +450,7 @@ function C7_order_place({
     return () => {
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [onClose]);
+  }, [requestClose]);
 
   const handleDecrease = (item: OrderItem) => {
     if (item.quantity === 1) {
@@ -471,18 +472,29 @@ function C7_order_place({
   );
 
   return (
-    <div
-      className={overlay}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
-    >
-      <div
-        className={order_place}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
+    <AnimatePresence onExitComplete={onClose}>
+      {present && (
+        <motion.div
+          key="cart"
+          className={overlay}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.22 }}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              requestClose();
+            }
+          }}
+        >
+          <motion.div
+            className={order_place}
+            initial={reduceMotion ? false : { x: 48, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: reduceMotion ? 0 : 0.34, ease: softEase }}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
         <div className={order_header}>
           <h2>
             {t.cart.title}
@@ -490,7 +502,7 @@ function C7_order_place({
           </h2>
           <button
             className={cx(close_button, "icon")}
-            onClick={onClose}
+            onClick={requestClose}
             type="button"
             aria-label={t.cart.close}
           >
@@ -508,7 +520,7 @@ function C7_order_place({
                 <div className={item_top}>
                   <div>
                     <p>
-                      {item.roast} • {item.weight}
+                      {roastLabel(item.roast, language)} • {item.weight}
                     </p>
                     <h3>{item.name}</h3>
                   </div>
@@ -561,11 +573,11 @@ function C7_order_place({
           >
             {t.cart.checkout}
           </button>
-          <button className={continue_button} onClick={onClose} type="button">
+          <button className={continue_button} onClick={requestClose} type="button">
             {t.cart.continue_shopping}
           </button>
         </div>
-      </div>
+          </motion.div>
       {checkoutOpen && (
         <Checkout
           language={language}
@@ -577,11 +589,13 @@ function C7_order_place({
           }}
           onSuccessClose={() => {
             setCheckoutOpen(false);
-            onClose();
+            requestClose();
           }}
         />
       )}
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

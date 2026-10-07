@@ -13,6 +13,8 @@ type Props = {
   requests: CustomRoastingRequest[];
   onStatusChange: (id: number, status: CustomRoastingStatus) => void;
   onDelete: (id: number) => void;
+  onResend: (id: number) => void;
+  resendingId: number | null;
 };
 
 const list = css({
@@ -25,7 +27,14 @@ const list = css({
   },
 });
 
-function ARoast_List({ language, requests, onStatusChange, onDelete }: Props) {
+function ARoast_List({
+  language,
+  requests,
+  onStatusChange,
+  onDelete,
+  onResend,
+  resendingId,
+}: Props) {
   return (
     <div className={list}>
       {requests.map((request) => (
@@ -35,6 +44,8 @@ function ARoast_List({ language, requests, onStatusChange, onDelete }: Props) {
           request={request}
           onStatusChange={onStatusChange}
           onDelete={onDelete}
+          onResend={onResend}
+          isResending={resendingId === request.id}
         />
       ))}
     </div>

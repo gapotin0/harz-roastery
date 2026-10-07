@@ -10,10 +10,18 @@ import { getStorage } from "firebase-admin/storage";
 // CONFIG
 // ----------------------------------------------------------------------
 
-const storageBucket = process.env.FIREBASE_STORAGE_BUCKET?.trim();
+// Cloud Functions already authenticate as the runtime service account.
+// A local credentials path from .env would point at a file that is not deployed.
+if (process.env.K_SERVICE) {
+  delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
+}
+
+const storageBucket = (
+  process.env.STORAGE_BUCKET ?? process.env.FIREBASE_STORAGE_BUCKET
+)?.trim();
 
 if (!storageBucket) {
-  throw new Error("FIREBASE_STORAGE_BUCKET is not configured.");
+  throw new Error("STORAGE_BUCKET is not configured.");
 }
 
 // ----------------------------------------------------------------------

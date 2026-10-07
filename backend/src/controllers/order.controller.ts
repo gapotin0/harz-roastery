@@ -1,15 +1,22 @@
 import type { Request, Response } from "express";
 
-import { sendOrderNotification } from "../services/telegram.service";
+import {
+  deliverTelegramNotification,
+  deliverTelegramNotificationInBackground,
+  sendOrderNotification,
+} from "../services/telegram.service";
 import {
   createOrder,
   deleteOrder,
+  getOrder,
   getOrders,
+  saveOrderNotification,
   updateOrderStatus,
   type CreateOrderInput,
   type OrderCustomer,
   type OrderStatus,
 } from "../services/order.service";
+import { contactError } from "../utils/contact";
 
 // ----------------------------------------------------------------------
 // VALIDATION
@@ -100,21 +107,30 @@ export async function addOrder(request: Request, response: Response) {
   try {
     const input = request.body;
 
+    const customer = {
+      name: input.customer.name.trim(),
+      phone: input.customer.phone.trim(),
+      email: input.customer.email.trim(),
+      city: input.customer.city.trim(),
+      address: input.customer.address.trim(),
+      comment: input.customer.comment.trim(),
+    };
+    const invalidContact = contactError(customer.email, customer.phone);
+
+    if (invalidContact) {
+      response.status(400).json({ message: invalidContact });
+      return;
+    }
+
     const order = await createOrder({
-      customer: {
-        name: input.customer.name.trim(),
-        phone: input.customer.phone.trim(),
-        email: input.customer.email.trim(),
-        city: input.customer.city.trim(),
-        address: input.customer.address.trim(),
-        comment: input.customer.comment.trim(),
-      },
+      customer,
       items: input.items,
     });
 
-    void sendOrderNotification(order).catch((error: unknown) => {
-      console.error("Telegram order notification failed:", error);
-    });
+    deliverTelegramNotificationInBackground(
+      () => sendOrderNotification(order),
+      (notification) => saveOrderNotification(order.id, notification),
+    );
 
     response.status(201).json(order);
   } catch (error) {
@@ -129,6 +145,33 @@ export async function addOrder(request: Request, response: Response) {
 // ----------------------------------------------------------------------
 // STATUS
 // ----------------------------------------------------------------------
+
+export async function resendOrderToTelegram(
+  request: Request,
+  response: Response,
+) {
+  const id = Number(request.params.id);
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    response.status(400).json({ message: "Invalid order id." });
+    return;
+  }
+
+  try {
+    const order = await getOrder(id);
+    const notification = await deliverTelegramNotification(() =>
+      sendOrderNotification(order),
+    );
+    const updatedOrder = await saveOrderNotification(id, notification);
+
+    response.json(updatedOrder);
+  } catch (error) {
+    console.error("Resend order notification error:", error);
+    response.status(500).json({
+      message: "Failed to send the order to Telegram.",
+    });
+  }
+}
 
 export async function changeOrderStatus(request: Request, response: Response) {
   const id = Number(request.params.id);

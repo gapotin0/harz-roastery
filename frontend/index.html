@@ -425,6 +425,37 @@
   </head>
 
   <body>
+    <script>
+      (function () {
+        var savedLanguage = null;
+        var savedTheme = null;
+
+        try {
+          savedLanguage = localStorage.getItem("harz-language");
+          savedTheme = localStorage.getItem("harz-theme");
+        } catch (error) {}
+
+        var language =
+          savedLanguage === "en" || savedLanguage === "uk" ? savedLanguage : "uk";
+        var theme =
+          savedTheme === "light" || savedTheme === "dark"
+            ? savedTheme
+            : window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark";
+
+        document.documentElement.lang = language;
+        document.documentElement.setAttribute("data-theme", theme);
+
+        var themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) {
+          themeColor.setAttribute(
+            "content",
+            theme === "light" ? "#f3ede6" : "#120d0b",
+          );
+        }
+      })();
+    </script>
     <div id="root"></div>
 
     <script type="module" src="/src/main.tsx"></script>

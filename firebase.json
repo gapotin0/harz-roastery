@@ -1,0 +1,38 @@
+{
+  "functions": [
+    {
+      "source": "backend",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "secrets",
+        "src",
+        ".env",
+        ".env.*",
+        "*.md",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": ["npm --prefix backend run build"]
+    }
+  ],
+  "hosting": {
+    "public": "frontend/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "predeploy": ["npm --prefix frontend run build"],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": {
+          "functionId": "api",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { css, cx } from "@emotion/css";
 import {
   onAuthStateChanged,
@@ -11,6 +11,7 @@ import AdminDashboard from "./Admin_Page_Dashboard";
 import { getCourseEnrollments } from "../services/courseEnrollmentApi";
 import { getCustomRoastingRequests } from "../services/customRoastingApi";
 import { auth } from "../services/firebase";
+import { applyLanguage, readLanguage } from "../preferences";
 import { getOrders } from "../services/orderApi";
 
 import type { Course } from "../data/courses";
@@ -217,7 +218,14 @@ function AdminPanel({
   courseEnrollments,
   setCourseEnrollments,
 }: AdminPanelProps) {
-  const [language, setLanguage] = useState<AdminLanguage>("en");
+  const [language, setLanguageState] = useState<AdminLanguage>(readLanguage);
+  const setLanguage: Dispatch<SetStateAction<AdminLanguage>> = (value) => {
+    setLanguageState((current) => {
+      const next = typeof value === "function" ? value(current) : value;
+      applyLanguage(next);
+      return next;
+    });
+  };
   const t = adminTranslations[language];
 
   // ----------------------------------------------------------------------

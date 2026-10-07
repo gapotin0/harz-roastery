@@ -1,8 +1,11 @@
+import { useState } from "react";
+
 import ARoast_EmptyState from "./roast/ARoast_EmptyState";
 import ARoast_List from "./roast/ARoast_List";
 
 import {
   deleteCustomRoastingRequest,
+  resendCustomRoastingNotification,
   updateCustomRoastingStatus,
 } from "../services/customRoastingApi";
 
@@ -29,6 +32,7 @@ function AdminCustomRoasting({
   isLoading,
 }: Props) {
   const t = adminTranslations[language].roasting;
+  const [resendingId, setResendingId] = useState<number | null>(null);
 
   // ----------------------------------------------------------------------
   // STATUS
@@ -42,7 +46,9 @@ function AdminCustomRoasting({
       const updatedRequest = await updateCustomRoastingStatus(id, status);
       setRequests((currentRequests) =>
         currentRequests.map((request) =>
-          request.id === updatedRequest.id ? updatedRequest : request,
+          request.id === updatedRequest.id
+            ? { ...request, status: updatedRequest.status }
+            : request,
         ),
       );
     } catch (error) {
@@ -53,6 +59,33 @@ function AdminCustomRoasting({
           ? error.message
           : "Failed to update custom roasting request.",
       );
+    }
+  };
+
+  // ----------------------------------------------------------------------
+  // TELEGRAM
+  // ----------------------------------------------------------------------
+
+  const handleResend = async (id: number) => {
+    setResendingId(id);
+
+    try {
+      const updatedRequest = await resendCustomRoastingNotification(id);
+      setRequests((currentRequests) =>
+        currentRequests.map((request) =>
+          request.id === updatedRequest.id ? updatedRequest : request,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to resend roasting notification:", error);
+
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to send the roasting request to Telegram.",
+      );
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -109,6 +142,8 @@ function AdminCustomRoasting({
       requests={requests}
       onStatusChange={handleStatusChange}
       onDelete={handleDelete}
+      onResend={handleResend}
+      resendingId={resendingId}
     />
   );
 }
