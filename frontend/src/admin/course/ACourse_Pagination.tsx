@@ -22,52 +22,108 @@ type Props = {
 
 const pagination = css({
   display: "flex",
-  justifyContent: "center",
   alignItems: "center",
+  justifyContent: "center",
   flexWrap: "wrap",
 
-  marginTop: "32px",
-  gap: "8px",
+  marginTop: "8px",
+  gap: "6px",
 });
 
 const page_button = css({
-  display: "flex",
+  display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
 
-  minWidth: "40px",
-  height: "40px",
+  minWidth: "42px",
+  height: "42px",
 
   padding: "0 12px",
 
   backgroundColor: "transparent",
-  border: "1px solid var(--sand-line)",
-  borderRadius: "10px",
+  border: "1px solid transparent",
+  borderRadius: "100px",
 
   color: "var(--text-main)",
+
   font: "inherit",
-  fontSize: "13px",
-  fontWeight: "700",
+  fontSize: "14px",
+  fontWeight: "600",
 
   cursor: "pointer",
+
   transition: "background-color 0.15s ease, border-color 0.15s ease",
 
   "&:hover:not(:disabled)": {
     backgroundColor: "var(--chip-bg)",
-    borderColor: "var(--clay)",
   },
 
   "&:disabled": {
-    opacity: 0.4,
-    cursor: "default",
+    opacity: 0.35,
+    cursor: "not-allowed",
   },
 });
 
-const active_page = css({
+const navigation_button = css({
+  border: "1px solid var(--sand-line)",
+});
+
+const active_button = css({
   backgroundColor: "var(--clay) !important",
   borderColor: "var(--clay) !important",
+
   color: "#f3ede6 !important",
 });
+
+const dots = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+
+  width: "32px",
+
+  color: "var(--text-muted)",
+
+  fontWeight: "700",
+});
+
+// ----------------------------------------------------------------------
+// HELPERS
+// ----------------------------------------------------------------------
+
+function getPaginationItems(
+  currentPage: number,
+  totalPages: number,
+): Array<number | "..."> {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  if (currentPage <= 3) {
+    return [1, 2, 3, 4, "...", totalPages];
+  }
+
+  if (currentPage >= totalPages - 2) {
+    return [
+      1,
+      "...",
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
+  }
+
+  return [
+    1,
+    "...",
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    "...",
+    totalPages,
+  ];
+}
 
 // ----------------------------------------------------------------------
 // COMPONENT
@@ -85,47 +141,44 @@ function ACourse_Pagination({
     return null;
   }
 
-  const getPages = () => {
-    const pages: number[] = [];
-    const start = Math.max(1, currentPage - 2);
-    const end = Math.min(totalPages, currentPage + 2);
-
-    for (let page = start; page <= end; page++) {
-      pages.push(page);
-    }
-
-    return pages;
-  };
+  const items = getPaginationItems(currentPage, totalPages);
 
   return (
     <div className={pagination}>
       <button
         type="button"
-        className={page_button}
+        className={cx(page_button, navigation_button)}
         disabled={currentPage === 1}
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         aria-label={t.previous}
-        onClick={() => onPageChange(currentPage - 1)}
       >
         ←
       </button>
-      {getPages().map((page) => (
-        <button
-          key={page}
-          type="button"
-          className={cx(page_button, page === currentPage && active_page)}
-          aria-current={page === currentPage ? "page" : undefined}
-          aria-label={`${page}`}
-          onClick={() => onPageChange(page)}
-        >
-          {page}
-        </button>
-      ))}
+
+      {items.map((item, index) =>
+        item === "..." ? (
+          <span key={`dots-${index}`} className={dots}>
+            ...
+          </span>
+        ) : (
+          <button
+            key={item}
+            type="button"
+            className={cx(page_button, currentPage === item && active_button)}
+            onClick={() => onPageChange(item)}
+            aria-current={currentPage === item ? "page" : undefined}
+          >
+            {item}
+          </button>
+        ),
+      )}
+
       <button
         type="button"
-        className={page_button}
+        className={cx(page_button, navigation_button)}
         disabled={currentPage === totalPages}
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         aria-label={t.next}
-        onClick={() => onPageChange(currentPage + 1)}
       >
         →
       </button>
