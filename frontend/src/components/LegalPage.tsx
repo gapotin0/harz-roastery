@@ -7,7 +7,7 @@ import { rise, useSoftMotion } from "./motion";
 import { readLanguage } from "../preferences";
 import { translations } from "./translations";
 
-import logo_minimal from "../assets/logo_minimal.svg";
+import logo_minimal from "../assets/logo_minimal_alt.png";
 
 type LegalPageProps = {
   page: "privacy" | "terms";
@@ -93,8 +93,12 @@ function LegalPage({ page }: LegalPageProps) {
     <main className={cx("font-onest", page_style)}>
       <div className={top_bar}>
         <Link className={brand} to="/">
-          <img src={logo_minimal} alt="" />
-          <span>HARZ ROASTERY</span>
+          <img
+            src={logo_minimal}
+            alt=""
+            style={{ userSelect: "none", pointerEvents: "none" }}
+          />
+          <span>ZHAROVNYA ROASTERY</span>
         </Link>
         <Link to="/">{t.legal.back}</Link>
       </div>

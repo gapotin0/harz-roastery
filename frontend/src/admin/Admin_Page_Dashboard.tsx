@@ -754,7 +754,7 @@ function AdminDashboard({
         {/* TOP */}
 
         <div className={sidebar_top}>
-          <div className={sidebar_logo}>HARZ ADMIN</div>
+          <div className={sidebar_logo}>ADMIN PANEL</div>
 
           <div ref={menuRef} className={menu_wrapper}>
             <button

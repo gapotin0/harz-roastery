@@ -148,7 +148,7 @@ function C2_who_we_are({ language }: C2Props) {
       {...reveal}
     >
       <motion.div className={c2_left} variants={rise}>
-        <img src={photo} alt="Photo" loading="lazy" decoding="async" />
+        <img src={photo} alt="Photo" loading="lazy" decoding="async" style={{ userSelect: "none", pointerEvents: "none" }} />
       </motion.div>
       <motion.div className={c2_right} variants={rise}>
         <h2 className={c2_title}>{t.c2.title}</h2>

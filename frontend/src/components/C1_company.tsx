@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { rise, softEase, stagger } from "./motion";
 import { translations } from "./translations";
 
-import logo from "../assets/logo.webp";
+import logo from "../assets/Logo.png";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -65,9 +65,11 @@ const image_circle = css({
   borderRadius: "50%",
 
   "& img": {
-    width: "100%",
-    height: "100%",
+    width: "90%",
+    height: "90%",
     objectFit: "contain",
+    userSelect: "none",
+    pointerEvents: "none",
   },
 
   "@media (max-width: 1200px)": {
@@ -197,6 +199,12 @@ const primary_button = css({
   fontWeight: "600",
 
   cursor: "pointer",
+  transition: "background-color 0.15s ease, color 0.15s ease",
+
+  "&:hover": {
+    background: "var(--clay-soft)",
+    color: "white",
+  },
 
   "@media (max-width: 480px)": {
     width: "100%",
@@ -216,6 +224,12 @@ const secondary_button = css({
   fontWeight: "600",
 
   cursor: "pointer",
+  transition: "background-color 0.15s ease, color 0.15s ease",
+
+  "&:hover": {
+    backgroundColor: "var(--text-main)",
+    color: "var(--bg-page)",
+  },
 
   "@media (max-width: 480px)": {
     width: "100%",

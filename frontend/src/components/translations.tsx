@@ -14,9 +14,9 @@ export const translations = {
     },
 
     c1: {
-      text_before_accent: "Coffee,",
-      accent: " chosen ",
-      text_after_accent: "consciously",
+      text_before_accent: "Flavor,",
+      accent: " forged ",
+      text_after_accent: "by fire.",
       additional_text:
         "We source green beans directly from sustainable micro-lots around the globe, bringing them to our Lviv roastery to unlock their purest potential. Crafted with precision, roasted with intent.",
       btm1_shop: "Shop coffee",
@@ -26,7 +26,7 @@ export const translations = {
     c2: {
       title: "Who We Are",
       second_title: "Heritage & Craft in Lviv",
-      text: "Founded in the historic heart of Lviv, HARZ Roastery stands as a testament to the city's rich coffee heritage combined with modern third-wave specialty standards. We operate on a zero-compromise policy when it comes to the quality of our green beans and the precision of our roasts.",
+      text: "Founded in the historic heart of Lviv, ZHAROVNYA Roastery stands as a testament to the city's rich coffee heritage combined with modern third-wave specialty standards. We operate on a zero-compromise policy when it comes to the quality of our green beans and the precision of our roasts.",
       text_muted:
         "Every single batch is profiled, monitored via advanced thermodynamics, and cupped by our Q-graders. We believe coffee is not just a daily stimulant, but a complex, conscious experience meant to be savored.",
     },
@@ -185,13 +185,13 @@ export const translations = {
         "Specialty coffee roastery based in Lviv. Dedicated to zero compromises and conscious bean curation.",
 
       roastery_title: "ROASTERY & ACADEMY",
-      address: "42 Zelena Street, Lviv, Ukraine",
+      address: "50/52 Promyslova St., Lviv, Ukraine",
       working_hours: "Mon – Fri: 09:00 – 19:00",
 
       contact_title: "CONTACT",
-      email: "hello@harzroastery.com",
+      email: "zharovnya.rostery@gmail.com",
 
-      copyright: "© 2026 HARZ Roastery. All rights reserved.",
+      copyright: "© 2026 ZHAROVNYA Roastery. All rights reserved.",
       privacy: "Privacy Policy",
       terms: "Terms of Service",
     },
@@ -203,15 +203,15 @@ export const translations = {
         paragraphs: [
           "When you place an order, enroll in a course, or request a custom roast, we ask for the details needed to fulfill that request: your name, email, phone number, and, for coffee orders, the delivery city and address.",
           "We use this information to prepare the order or request and to contact you about it. Orders, enrollments, and roasting requests are stored in Firebase, and a notification is sent to the roastery in Telegram.",
-          "We do not sell this information. To ask about your data, write to hello@harzroastery.com.",
+          "We do not sell this information. To ask about your data, write to zharovnya.rostery@gmail.com.",
         ],
       },
       terms: {
         title: "Terms of Service",
         paragraphs: [
-          "HARZ Roastery sells specialty coffee and accepts requests for barista courses and custom roasting. Prices shown on the site are the prices of the coffee or the course.",
+          "ZHAROVNYA Roastery sells specialty coffee and accepts requests for barista courses and custom roasting. Prices shown on the site are the prices of the coffee or the course.",
           "Sending an order or a request does not take payment on the site. We confirm availability, delivery, and payment with you directly.",
-          "Questions about an order, a course, or a roast can be sent to hello@harzroastery.com.",
+          "Questions about an order, a course, or a roast can be sent to zharovnya.rostery@gmail.com.",
         ],
       },
     },
@@ -245,9 +245,9 @@ export const translations = {
     },
 
     c1: {
-      text_before_accent: "Кава,",
-      accent: " обрана ",
-      text_after_accent: "свідомо",
+      text_before_accent: "Вогонь,",
+      accent: " формує ",
+      text_after_accent: "смак.",
       additional_text:
         "Ми закуповуємо зелені зерна безпосередньо з екологічно відповідальних мікролотів по всьому світу й доставляємо їх до нашої львівської ростерні, щоб розкрити їхній найчистіший потенціал. Майстерність у кожній деталі, усвідомлений підхід до обсмажування.",
       btm1_shop: "Магазин кави",
@@ -257,7 +257,7 @@ export const translations = {
     c2: {
       title: "Хто ми",
       second_title: "Спадщина та майстерність у Львові",
-      text: "Заснована в історичному серці Львова, HARZ Roastery поєднує багату кавову спадщину міста із сучасними стандартами specialty-кави третьої хвилі. Ми дотримуємося принципу безкомпромісної якості, коли йдеться про відбір зеленого зерна та точність обсмажування.",
+      text: "Заснована в історичному серці Львова, ZHAROVNYA Roastery поєднує багату кавову спадщину міста із сучасними стандартами specialty-кави третьої хвилі. Ми дотримуємося принципу безкомпромісної якості, коли йдеться про відбір зеленого зерна та точність обсмажування.",
       text_muted:
         "Кожна партія має власний профіль обсмажування, контролюється за допомогою сучасних термодинамічних методів і проходить капінг нашими Q-грейдерами. Ми вважаємо, що кава — це не просто щоденний стимулятор, а складний, усвідомлений досвід, яким варто насолоджуватися.",
     },
@@ -323,7 +323,7 @@ export const translations = {
 
     c5: {
       title: "АКАДЕМІЯ",
-      second_title: "Курси для бариста та ростерів",
+      second_title: "Курси для бариста та з обсмажування кави",
 
       c1_title: "Основи бариста SCA",
       c1_text:
@@ -417,13 +417,13 @@ export const translations = {
         "Specialty-ростерія у Львові. Ми дотримуємося принципу безкомпромісної якості та усвідомленого відбору кавового зерна.",
 
       roastery_title: "РОСТЕРІЯ ТА АКАДЕМІЯ",
-      address: "вул. Зелена, 42, Львів, Україна",
+      address: "вул. Промислова, 50/52, Львів, Україна",
       working_hours: "Пн – Пт: 09:00 – 19:00",
 
       contact_title: "КОНТАКТИ",
-      email: "hello@harzroastery.com",
+      email: "zharovnya.rostery@gmail.com",
 
-      copyright: "© 2026 HARZ Roastery. Усі права захищено.",
+      copyright: "© 2026 ZHAROVNYA Roastery. Усі права захищено.",
       privacy: "Політика конфіденційності",
       terms: "Умови користування",
     },
@@ -435,15 +435,15 @@ export const translations = {
         paragraphs: [
           "Коли ви оформлюєте замовлення, записуєтесь на курс або залишаєте заявку на обсмажування, ми просимо дані, потрібні для цього запиту: ім’я, електронну пошту, телефон, а для замовлення кави — місто й адресу доставки.",
           "Ці дані використовуються, щоб виконати замовлення чи заявку і зв’язатися з вами. Замовлення, записи на курси та заявки на обсмажування зберігаються у Firebase, а сповіщення надсилається ростерії в Telegram.",
-          "Ми не продаємо ці дані. Питання щодо ваших даних можна надіслати на hello@harzroastery.com.",
+          "Ми не продаємо ці дані. Питання щодо ваших даних можна надіслати на zharovnya.rostery@gmail.com.",
         ],
       },
       terms: {
         title: "Умови користування",
         paragraphs: [
-          "HARZ Roastery продає спешелті каву та приймає заявки на курси бариста й індивідуальне обсмажування. Ціни на сайті — це ціни кави або курсу.",
+          "ZHAROVNYA Roastery продає спешелті каву та приймає заявки на курси бариста й індивідуальне обсмажування. Ціни на сайті — це ціни кави або курсу.",
           "Надсилання замовлення чи заявки не списує оплату на сайті. Наявність, доставку й оплату ми підтверджуємо з вами напряму.",
-          "Питання щодо замовлення, курсу чи обсмажування можна надіслати на hello@harzroastery.com.",
+          "Питання щодо замовлення, курсу чи обсмажування можна надіслати на zharovnya.rostery@gmail.com.",
         ],
       },
     },

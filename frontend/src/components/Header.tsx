@@ -18,7 +18,7 @@ import { translations } from "./translations";
 
 import img_cart from "../assets/header/cart.svg";
 import img_menu from "../assets/header/menu.svg";
-import logo_minimal from "../assets/logo_minimal.svg";
+import logo_minimal from "../assets/logo_minimal_alt.png";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -80,6 +80,10 @@ const logo_place = css({
 
   gap: "10px",
 
+  textDecoration: "none",
+  color: "inherit",
+  cursor: "pointer",
+
   "& img": {
     height: "28px",
     width: "28px",
@@ -140,6 +144,10 @@ const navigation = css({
     fontWeight: "500",
     textDecoration: "none",
     whiteSpace: "nowrap",
+
+    "&:hover": {
+      color: "var(--text-main)",
+    },
   },
 
   "@media (max-width: 1100px)": {
@@ -179,6 +187,12 @@ const shop_button = css({
   fontWeight: "600",
 
   cursor: "pointer",
+  transition: "background-color 0.15s ease, color 0.15s ease",
+
+  "&:hover": {
+    background: "var(--clay-soft)",
+    color: "white",
+  },
 
   "@media (max-width: 768px)": {
     padding: "10px 18px",
@@ -422,15 +436,20 @@ function Header({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0 : 0.45, ease: softEase }}
     >
-      <motion.div
+      <motion.a
+        href="#about"
         className={logo_place}
         whileHover={reduceMotion ? undefined : { scale: 1.03 }}
         whileTap={reduceMotion ? undefined : { scale: 0.98 }}
         transition={{ duration: 0.2 }}
       >
-        <img src={logo_minimal} alt="HARZ Roastery" />
-        <span>HARZ ROASTERY</span>
-      </motion.div>
+        <img
+          src={logo_minimal}
+          alt="ZHAROVNYA Roastery"
+          style={{ userSelect: "none", pointerEvents: "none" }}
+        />
+        <span>ZHAROVNYA ROASTERY</span>
+      </motion.a>
       <div className={navigation_wrapper}>
         <nav aria-label="main-navigation">
           <ul className={navigation}>

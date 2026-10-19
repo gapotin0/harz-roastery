@@ -67,6 +67,7 @@ const c7_card_info = css({
   gap: "20px",
 
   backgroundColor: "var(--bg-card)",
+  justifyContent: "space-between",
 
   "@media (max-width: 768px)": {
     padding: "20px",
@@ -87,6 +88,12 @@ const c7_card_info_top = css({
   "& p": {
     margin: 0,
   },
+});
+
+const c7_card_info_rest = css({
+  display: "flex",
+  flexDirection: "column",
+  gap: "15px",
 });
 
 const c7_roast = css({
@@ -185,7 +192,14 @@ const c7_card_info_bot = css({
   "@media (max-width: 600px)": {
     flexDirection: "column",
     alignItems: "stretch",
+    alignContent: "flex-end",
     gap: "10px",
+
+    "& > p": {
+      width: "100%",
+      textAlign: "left",
+      margin: 0,
+    },
   },
 });
 
@@ -216,10 +230,11 @@ const add_button = css({
   whiteSpace: "nowrap",
 
   cursor: "pointer",
-  transition: "opacity 0.15s ease",
+  transition: "background-color 0.15s ease, color 0.15s ease",
 
   "&:hover": {
-    opacity: 0.9,
+    background: "var(--clay-soft)",
+    color: "white",
   },
 
   "&:disabled": {
@@ -260,6 +275,7 @@ function C7_shop_card({ product, onAddToCart, language, delay = 0 }: Props) {
           alt={product.name}
           loading="lazy"
           decoding="async"
+          style={{ userSelect: "none", pointerEvents: "none" }}
           onError={(event) => {
             event.currentTarget.onerror = null;
             event.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -277,6 +293,8 @@ function C7_shop_card({ product, onAddToCart, language, delay = 0 }: Props) {
           </div>
           <h4 className={product_name}>{product.name}</h4>
           <p className={product_description}>{product.description[language]}</p>
+        </div>
+        <div className={c7_card_info_rest}>
           <div className={product_meta}>
             <p className={product_weight}>{product.weight}</p>
             <p className={cx(stock, product.inStock ? in_stock : out_of_stock)}>
@@ -289,8 +307,7 @@ function C7_shop_card({ product, onAddToCart, language, delay = 0 }: Props) {
                   : "Out of stock"}
             </p>
           </div>
-        </div>
-        <div className={c7_card_info_bot}>
+          <div className={c7_card_info_bot}>
           <p className={product_price}>₴{product.price}</p>
           <motion.button
             type="button"
@@ -311,6 +328,7 @@ function C7_shop_card({ product, onAddToCart, language, delay = 0 }: Props) {
                 ? "Немає в наявності"
                 : "Out of stock"}
             </motion.button>
+          </div>
         </div>
       </div>
     </motion.article>

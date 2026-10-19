@@ -215,6 +215,7 @@ function C6_custom_roasting({ language }: C6Props) {
               alt="Coffee roaster"
               loading="lazy"
               decoding="async"
+              style={{ userSelect: "none", pointerEvents: "none" }}
               initial={reduce ? false : { scale: 1.08 }}
               whileInView={{ scale: 1 }}
               viewport={{ once: true, amount: 0.4 }}

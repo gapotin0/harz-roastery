@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { rise, useSoftMotion } from "./motion";
 import { translations } from "./translations";
 
-import logo_minimal from "../assets/logo_minimal.svg";
+import logo_minimal from "../assets/logo_minimal_alt.png";
 
 // ----------------------------------------------------------------------
 // TYPES
@@ -248,8 +248,15 @@ function Footer({ language }: FooterProps) {
       <div className={footer_top}>
         <div className={footer_t_l}>
           <div>
-            <img src={logo_minimal} alt="logo_minimal" />
-            <h3>HARZ</h3>
+            <img
+              src={logo_minimal}
+              alt="ZHAROVNYA"
+              style={{
+                userSelect: "none",
+                pointerEvents: "none",
+              }}
+            />
+            <h3>ZHAROVNYA</h3>
           </div>
           <p>{t.footer.description}</p>
         </div>
@@ -257,12 +264,10 @@ function Footer({ language }: FooterProps) {
           <div>
             <h4>{t.footer.roastery_title}</h4>
             <p>{t.footer.address}</p>
-            <p>{t.footer.working_hours}</p>
           </div>
           <div>
             <h4>{t.footer.contact_title}</h4>
             <h5>{t.footer.email}</h5>
-            <p>{t.footer.working_hours}</p>
           </div>
         </div>
       </div>

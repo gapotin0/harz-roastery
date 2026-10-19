@@ -369,10 +369,11 @@ const checkout_button = css({
   fontWeight: "700",
 
   cursor: "pointer",
-  transition: "opacity 0.15s ease",
+  transition: "background-color 0.15s ease, color 0.15s ease",
 
   "&:hover": {
-    opacity: 0.9,
+    background: "var(--clay-soft)",
+    color: "white",
   },
 
   "&:disabled": {

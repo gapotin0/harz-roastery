@@ -373,7 +373,7 @@ function AdminPanel({
     return (
       <main className={cx(admin_page, "font-onest")}>
         <div className={login_card}>
-          <h1>HARZ Admin</h1>
+          <h1>Admin Panel</h1>
           <p>Loading...</p>
         </div>
       </main>

@@ -40,6 +40,7 @@ const c5_place = css({
   "@media (max-width: 768px)": {
     padding: "80px 24px",
     gap: "40px",
+    scrollMarginTop: "20px",
   },
 
   "@media (max-width: 480px)": {
@@ -234,7 +235,13 @@ function C5_academy({ language, courses }: C5Props) {
 
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
-  const activeCourses = courses.filter((course) => course.active);
+  const activeCourses = courses.filter((course) => course.active !== false);
+
+  // The list mounts only after courses arrive. whileInView already fired for
+  // the title by then, so a second whileInView on the grid stays at opacity 0.
+  const listMotion = reduce
+    ? { initial: false as const }
+    : { initial: "hidden" as const, animate: "show" as const };
 
   const selectedCourse =
     selectedCourseId !== null
@@ -248,7 +255,7 @@ function C5_academy({ language, courses }: C5Props) {
         <h3 className={c5_second_title}>{t.c5.second_title}</h3>
       </motion.div>
       {activeCourses.length === 0 ? (
-        <motion.div className={empty_state} variants={rise} {...reveal}>
+        <motion.div className={empty_state} variants={rise} {...listMotion}>
           <p>
             {language === "uk"
               ? "Наразі доступних курсів немає."
@@ -256,7 +263,7 @@ function C5_academy({ language, courses }: C5Props) {
           </p>
         </motion.div>
       ) : (
-        <motion.div className={c5_card_place} variants={stagger} {...reveal}>
+        <motion.div className={c5_card_place} variants={stagger} {...listMotion}>
           {activeCourses.map((course) => (
             <motion.button
               key={course.id}
